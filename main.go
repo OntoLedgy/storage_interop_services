@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	//"github.com/saintfish/chardet"
-	"storage/csv"
+	"storage_interop_services/csv"
 )
 
 func main() {
@@ -30,7 +30,7 @@ func main() {
 			//fmt.Printf("%v:, %30q\n ", col_index, col)
 
 		}
-		//storage.Write_slice_to_csv_split_by_column(4, csv_file)
+		//storage_interop_services.Write_slice_to_csv_split_by_column(4, csv_file)
 	}
 
 }
