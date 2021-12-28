@@ -10,6 +10,8 @@ type Drivers interface {
 	Close() error
 }
 
+//TODO needs to part of the factory
+
 func Register(driver *Drivers) (name string) {
 
 	if driver == nil {
@@ -18,5 +20,8 @@ func Register(driver *Drivers) (name string) {
 	if _, dup := drivers[name]; dup {
 		panic("Register called twice for driver " + name)
 	}
-	drivers[name] = driver
+	//drivers[name] = driver
+
+	return name
+
 }

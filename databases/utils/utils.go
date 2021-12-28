@@ -27,8 +27,8 @@ func GetUUID(
 
 	case 1:
 		// Creating UUIDs Version 4
-
-		*generated_uuid.UUID, uuid_error =
+		// TODO issue with IDE - reports error with return types.
+		*generated_uuid.UUID =
 			uuid.NewV4()
 
 	case 2:

@@ -1,9 +1,9 @@
 package files
 
 import (
-	"os"
 	"fmt"
-	"logger/standard_global_logger"
+	"github.com/OntoLedgy/logging_services/standard_global_logger"
+	"os"
 )
 
 func Create_file_if_does_not_exist_else_delete_it(filepath string) {
@@ -27,11 +27,9 @@ func Create_file_if_does_not_exist_else_delete_it(filepath string) {
 		fmt.Println("Existing file Deleted")
 	}
 
-
 }
 
-
-func Delete_file_it_already_exists(filepath string){
+func Delete_file_it_already_exists(filepath string) {
 
 	var _, err = os.Stat(filepath)
 
@@ -44,12 +42,11 @@ func Delete_file_it_already_exists(filepath string){
 		}
 		standard_global_logger.
 			Global_logger.
-				Printf("Existing file: %s Deleted\n",filepath)
+			Printf("Existing file: %s Deleted\n", filepath)
 
 	}
 
 }
-
 
 func isError(err error) bool {
 	if err != nil {
