@@ -13,7 +13,7 @@ type MsAccessDatabaseDrivers struct {
 
 func (ms_access_driver *MsAccessDatabaseDrivers) Open() (*sqlx.DB, error) {
 
-	//ms_access_driver := new(database.Driver)
+	//ms_access_driver := new(platform_specific_database_services.Driver)
 	var database_open_error error
 
 	connection_string := ms_access_driver.OleDb12ConnectionString

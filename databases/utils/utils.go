@@ -2,7 +2,7 @@ package utils
 
 import (
 	"fmt"
-	"gopkg.in/myesui/uuid.v1"
+	"github.com/satori/go.uuid"
 )
 
 type UUIDs struct {
@@ -16,9 +16,10 @@ func GetUUID(
 	error) {
 
 	var uuid_error error
+
 	generated_uuid := new(UUIDs)
 
-	uuid.SwitchFormatToUpper(uuid.FormatCanonicalCurly)
+	//uuid.SwitchFormatToUpper(uuid.FormatCanonicalCurly)
 
 	generated_uuid.UUID = new(uuid.UUID)
 
@@ -27,19 +28,21 @@ func GetUUID(
 	case 1:
 		// Creating UUIDs Version 4
 
-		*generated_uuid.UUID =
+		*generated_uuid.UUID, uuid_error =
 			uuid.NewV4()
 
 	case 2:
 		// Parsing UUIDs from string input
-		generated_uuid.UUID, uuid_error = uuid.Parse(seeding_string)
+		*generated_uuid.UUID, uuid_error =
+			uuid.FromString(seeding_string)
 
 		if uuid_error != nil {
 			fmt.Printf("Something went wrong: %s", uuid_error)
-			return generated_uuid, uuid_error
+			return nil, uuid_error
 		}
 
 	}
+
 	return generated_uuid, nil
 
 }

@@ -28,7 +28,7 @@ func ReadEncoding(filen string) (string, error) {
 	}
 
 	if p[0] != 0 {
-		return "", errors.New("ERROR no vaild general_database")
+		return "", errors.New("ERROR no vaild contract")
 	}
 
 	buf := make([]byte, 20)

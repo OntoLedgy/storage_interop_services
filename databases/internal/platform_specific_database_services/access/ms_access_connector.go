@@ -16,8 +16,8 @@ import (
 
 
 func init() {
-	//database := MsAccessDatabaseDrivers{}
-	//general_database.Register(database_driver_type, &database)
+	//platform_specific_database_services := MsAccessDatabaseDrivers{}
+	//contract.Register(database_driver_type, &platform_specific_database_services)
 }
 
 //

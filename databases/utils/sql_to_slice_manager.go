@@ -4,7 +4,7 @@ import "database/sql"
 
 //----------------------------------------------
 
-//#TODO - MOVE this into a ScanMsAccessRowset function in database pacakge
+//#TODO - MOVE this into a ScanMsAccessRowset function in platform_specific_database_services pacakge
 
 func Convert_rows_to_2d_slices(table_rowset *sql.Rows) [][]interface{} {
 

@@ -2,22 +2,23 @@ package main
 
 import (
 	"fmt"
-	//"github.com/saintfish/chardet"
-	"storage_interop_services/csv"
+	storage "github.com/OntoLedgy/storage_interop_services/csv"
 )
 
 func main() {
 
-	csv_file_name := `C:\OneDrive - BORO Engineering\BORO\Tools\Syntactic checker\Non-TEN_AllVersionsRenditions_20190104.csv`
+	//TODO move this to testing
+
+	csv_file_name :=
+		`C:\OneDrive - BORO Engineering\BORO\Tools\Syntactic checker\Non-TEN_AllVersionsRenditions_20190104.csv`
 
 	csv_file, csv_file_data := storage.Open_csv_file(csv_file_name)
 
-	csv_dataset := storage.Read_csv_to_slice(csv_file, csv_file_data)
-
-	/*for _, each := range csv_dataset {
-		fmt.Println(each)
-	}*/
-	//fmt.Println(csv_dataset)
+	csv_dataset :=
+		storage.Read_csv_to_slice(
+			csv_file,
+			csv_file_data,
+			",")
 
 	for row_index, row := range csv_dataset {
 		for col_index, col := range row {

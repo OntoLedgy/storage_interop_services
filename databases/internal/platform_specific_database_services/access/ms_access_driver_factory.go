@@ -1,6 +1,6 @@
 package access
 
-//import "database_manager/database"
+//import "database_manager/platform_specific_database_services"
 
 func Create(database_filename string) *MsAccessDatabaseDrivers {
 

@@ -1,7 +1,8 @@
 package access
 
 import (
-	"database_manager/general_database"
+	"github.com/OntoLedgy/storage_interop_services/databases/contract"
+	"github.com/OntoLedgy/storage_interop_services/databases/internal"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -16,13 +17,13 @@ type AccessSchema struct {
 }
 
 type MSAccessStatement struct {
-	*general_database.Tx
+	*internal.DatabaseTransactions
 }
 
-type MSAccessQuery general_database.Query
+type MSAccessQuery contract.Query
 
 type MSAccessQueryx struct {
-	*general_database.Queryx
+	*internal.Queryx
 }
 
 type MsAccessSqlStatement struct {
