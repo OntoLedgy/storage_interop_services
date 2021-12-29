@@ -2,7 +2,7 @@ package files
 
 import (
 	"fmt"
-	"github.com/OntoLedgy/logging_services/standard_global_logger"
+	"github.com/OntoLedgy/storage_interop_services/code/infrastructure/logging"
 	"os"
 )
 
@@ -40,8 +40,7 @@ func Delete_file_it_already_exists(filepath string) {
 		if isError(err) {
 			return
 		}
-		standard_global_logger.
-			Global_logger.
+		logging.GlobalLogger.
 			Printf("Existing file: %s Deleted\n", filepath)
 
 	}
