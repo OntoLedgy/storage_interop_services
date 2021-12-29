@@ -2,9 +2,9 @@ package model
 
 import (
 	"database/sql/driver"
-	database_contract "github.com/OntoLedgy/storage_interop_services/databases/contract"
-	database_contract_implementation "github.com/OntoLedgy/storage_interop_services/databases/internal"
-	"github.com/OntoLedgy/storage_interop_services/databases/utils"
+	database_contract "github.com/OntoLedgy/storage_interop_services/code/services/databases/contract"
+	database_contract_implementation "github.com/OntoLedgy/storage_interop_services/code/services/databases/internal"
+	"github.com/OntoLedgy/storage_interop_services/code/services/databases/utils"
 	"github.com/jmoiron/sqlx"
 	"github.com/satori/go.uuid"
 	"time"

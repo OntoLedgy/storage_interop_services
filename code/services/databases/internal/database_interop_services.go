@@ -3,7 +3,7 @@ package internal
 import (
 	"errors"
 	"fmt"
-	"github.com/OntoLedgy/storage_interop_services/databases/contract"
+	"github.com/OntoLedgy/storage_interop_services/code/services/databases/contract"
 	"github.com/jmoiron/sqlx"
 	"github.com/op/go-logging"
 	"reflect"

@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	storage "github.com/OntoLedgy/storage_interop_services/csv"
+	storage "github.com/OntoLedgy/storage_interop_services/code/services/documents/csv"
 )
 
 func main() {
