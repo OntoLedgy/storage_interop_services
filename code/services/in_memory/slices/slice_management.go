@@ -1,4 +1,4 @@
-package storage
+package slices
 
 import "encoding/json"
 
