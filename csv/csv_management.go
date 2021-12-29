@@ -3,7 +3,7 @@ package storage
 import (
 	"encoding/csv"
 	"fmt"
-	"github.com/OntoLedgy/storage_interop_services/code/infrastructure/logging"
+
 	"github.com/TomOnTime/utfutil"
 	"github.com/saintfish/chardet"
 	"io"
@@ -33,7 +33,7 @@ func Open_csv_file(csv_filename string) (*os.File, []byte) {
 	var detector = chardet.NewTextDetector()
 	result, err := detector.DetectBest(input)
 
-	logging.GlobalLogger.
+	fmt.
 		Printf(
 			"Opening File: %s, File Ecoding : %s , Language: %s \n",
 			csv_filename,
@@ -143,7 +143,7 @@ func Read_csv_to_slice(csv_file *os.File, csv_data_utfutls []byte, delimiter str
 		panic(csv_reader_error)
 	}
 	//--- END OF CSV READER
-	logging.GlobalLogger.
+	fmt.
 		Printf("Read csv data from: %s, length: %v\n", csv_file.Name(), len(csv_data))
 
 	//raw csv data generation  (NOT USED) -
