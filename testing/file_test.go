@@ -16,7 +16,7 @@ func TestStandard(t *testing.T) {
 	//TODO move this to testing
 
 	csv_file_name :=
-		`C:\OneDrive - BORO Engineering\BORO\Tools\Syntactic checker\Non-TEN_AllVersionsRenditions_20190104.csv`
+		`C:\S\test.text`
 
 	csv_file, csv_file_data := storage.Open_csv_file(csv_file_name)
 
