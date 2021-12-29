@@ -3,7 +3,7 @@ module github.com/OntoLedgy/storage_interop_services
 go 1.18
 
 require (
-	github.com/OntoLedgy/logging_services v0.0.0-20211227212339-f142c5eb1c3d
+	github.com/OntoLedgy/logging_services v0.0.5
 	github.com/TomOnTime/utfutil v0.0.0-20210710122150-437f72b26edf
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/mattn/go-adodb v0.0.1
