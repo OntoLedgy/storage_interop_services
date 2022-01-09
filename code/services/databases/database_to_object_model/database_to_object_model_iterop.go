@@ -20,6 +20,8 @@ func OrchestratePostGreToGoInterOp() {
 	cmdArgs.Port = "5432"
 	cmdArgs.DbType = "pg"
 
+	cmdArgs.PackageName = cmdArgs.DbName
+
 	cmdArgs.OutputFilePath = "D:\\S\\go\\src\\github.com\\OntoLedgy\\domain_ontologies\\code\\data_models"
 
 	Orchestrate_Cli(cmdArgs)
