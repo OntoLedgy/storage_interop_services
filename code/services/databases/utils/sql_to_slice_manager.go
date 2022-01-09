@@ -1,6 +1,9 @@
 package utils
 
-import "database/sql"
+import (
+	"database/sql"
+	"fmt"
+)
 
 //----------------------------------------------
 
@@ -72,4 +75,35 @@ func Convert_rows_to_1d_slice(table_rowset *sql.Rows) []interface{} {
 	}
 
 	return row_set_slice
+}
+
+func Change_2d_interface_slice_to_string(two_d_interface [][]interface{}) [][]string {
+
+	var return_string_slice [][]string
+	var return_string_row []string
+
+	for _, one_d_interface := range two_d_interface {
+
+		for _, interface_element := range one_d_interface {
+
+			switch interface_element.(type) {
+			case int:
+				str := fmt.Sprintf("%v", interface_element)
+				return_string_row = append(return_string_row, str)
+			case string:
+				str := fmt.Sprintf("%v", interface_element)
+				return_string_row = append(return_string_row, str)
+			default:
+				str := fmt.Sprintf("%v", interface_element)
+				return_string_row = append(return_string_row, str)
+			}
+
+		}
+
+		return_string_slice = append(return_string_slice, return_string_row)
+		return_string_row = nil
+	}
+
+	return return_string_slice
+
 }

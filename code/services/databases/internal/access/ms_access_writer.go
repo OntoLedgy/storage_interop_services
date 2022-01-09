@@ -1,5 +1,6 @@
 package access
 
+/*
 import (
 	"context"
 	"database/sql"
@@ -37,4 +38,4 @@ func CreateMsAccessTable(ms_access_database MsAccessDatabaseDrivers, table_name 
 func Append_to_ms_access_table(ms_access_database *sql.DB, table_name string, dataset [][]interface{}) {
 
 	return
-}
+}*/
