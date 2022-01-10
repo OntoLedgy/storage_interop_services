@@ -1,22 +1,32 @@
 package database
 
+//TODO needs to be integrated with databases contract -
+
 import (
 	"database/sql"
 	"fmt"
-
+	"github.com/OntoLedgy/storage_interop_services/code/object_model/configurations"
 	"github.com/jmoiron/sqlx"
-
-	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/pkg/settings"
 )
 
 var (
 	// dbTypeToDriverMap maps the database type to the driver names
-	dbTypeToDriverMap = map[settings.DbType]string{
-		settings.DbTypePostgresql: "postgres",
-		settings.DbTypeMySQL:      "mysql",
-		settings.DbTypeSQLite:     "sqlite3",
+	dbTypeToDriverMap = map[configurations.DatabaseType]string{
+		configurations.DbTypePostgresql: "postgres",
+		configurations.DbTypeMySQL:      "mysql",
+		configurations.DbTypeSQLite:     "sqlite3",
 	}
 )
+
+func CreateNewSettings() *configurations.DatabaseToGoSettings {
+	settingsFactory := &configurations.SettingsFactory{}
+
+	databaseToGoSettings := &configurations.DatabaseToGoSettings{
+		Settings: settingsFactory.Create(),
+	}
+
+	return databaseToGoSettings
+}
 
 // Database interface for the concrete databases
 type Database interface {
@@ -79,21 +89,21 @@ type Column struct {
 type GeneralDatabase struct {
 	GetColumnsOfTableStmt *sqlx.Stmt
 	*sqlx.DB
-	*settings.Settings
+	*configurations.Settings
 	driver string
 }
 
 // New creates a new Database based on the given type in the settings.
-func New(s *settings.Settings) Database {
+func New(s *configurations.Settings) Database {
 
 	var db Database
 
 	switch s.DbType {
-	case settings.DbTypeSQLite:
+	case configurations.DbTypeSQLite:
 		db = NewSQLite(s)
-	case settings.DbTypeMySQL:
+	case configurations.DbTypeMySQL:
 		db = NewMySQL(s)
-	case settings.DbTypePostgresql:
+	case configurations.DbTypePostgresql:
 		fallthrough
 	default:
 		db = NewPostgresql(s)

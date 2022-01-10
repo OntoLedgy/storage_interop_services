@@ -12,7 +12,8 @@ const (
 
 // Writer represents an interface to write the produced struct content.
 type Writer interface {
-	Write(tableName string, content string) error
+	Write(tableName string,
+		content string) error
 }
 
 // FileWriter is a writer that writes to a file given by the path and the table name.
@@ -34,10 +35,19 @@ func NewFileWriter(path string) *FileWriter {
 
 // Write is the implementation of the Writer interface. The FilerWriter writes
 // decorated content to the file specified by the given path and table name.
-func (w FileWriter) Write(tableName string, content string) error {
-	fileName := path.Join(w.path, tableName+FileWriterExtension)
+func (w FileWriter) Write(
+	tableName string,
+	content string) error {
 
-	decorated, err := w.decorate(content)
+	fileName :=
+		path.Join(
+			w.path,
+			tableName+FileWriterExtension)
+
+	decorated, err :=
+		w.decorate(
+			content)
+
 	if err != nil {
 		return err
 	}

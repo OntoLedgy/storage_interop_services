@@ -1,15 +1,17 @@
-package cli
+package database_to_object_model
 
 import (
 	"fmt"
+	"github.com/OntoLedgy/storage_interop_services/code/object_model/configurations"
+	"github.com/iancoleman/strcase"
+	"golang.org/x/text/language"
+
+	"golang.org/x/text/cases"
 	"strings"
 	"unicode"
 
-	"github.com/iancoleman/strcase"
-
 	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/pkg/database"
 	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/pkg/output"
-	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/pkg/settings"
 	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/pkg/tagger"
 )
 
@@ -21,66 +23,37 @@ var (
 	initialisms = []string{"ID", "JSON", "XML", "HTTP", "URL"}
 )
 
-// Run runs the transformations by creating the concrete Database by the provided settings
-func Run(settings *settings.Settings, db database.Database, out output.Writer) (err error) {
+// RunDatabaseToGoServices runs the transformations by creating the concrete Database by the provided settings
+func RunDatabaseToGoServices(
+	settings *configurations.Settings,
+	sourceDatabase database.Database,
+	out output.Writer) (
+	err error) {
 
-	taggers = tagger.NewTaggers(settings)
+	taggers =
+		tagger.NewTaggers(settings)
 
 	fmt.Printf("running for %q...\r\n", settings.DbType)
 
-	tables, err := db.GetTables()
+	sourceDatabaseTables, err :=
+		sourceDatabase.GetTables()
+
 	if err != nil {
-		return fmt.Errorf("could not get tables: %v", err)
+		return fmt.Errorf("could not get sourceDatabaseTables: %v", err)
 	}
 
 	if settings.Verbose {
-		fmt.Printf("> number of tables: %v\r\n", len(tables))
+		fmt.Printf("> number of sourceDatabaseTables: %v\r\n", len(sourceDatabaseTables))
 	}
 
-	if err = db.PrepareGetColumnsOfTableStmt(); err != nil {
-		return fmt.Errorf("could not prepare the get-column-statement: %v", err)
-	}
+	err = RunTableToGoServices(
+		settings,
+		sourceDatabase,
+		out,
+		sourceDatabaseTables)
 
-	for _, table := range tables {
-
-		if settings.Verbose {
-			fmt.Printf("> processing table %q\r\n", table.Name)
-		}
-
-		if err = db.GetColumnsOfTable(table); err != nil {
-			if !settings.Force {
-				return fmt.Errorf("could not get columns of table %q: %v", table.Name, err)
-			}
-			fmt.Printf("could not get columns of table %q: %v\n", table.Name, err)
-			continue
-		}
-
-		if settings.Verbose {
-			fmt.Printf("\t> number of columns: %v\r\n", len(table.Columns))
-		}
-
-		tableName, content, err := createTableStructString(settings, db, table)
-
-		if err != nil {
-			if !settings.Force {
-				return fmt.Errorf("could not create string for table %q: %v", table.Name, err)
-			}
-			fmt.Printf("could not create string for table %q: %v\n", table.Name, err)
-			continue
-		}
-
-		fileName := CamelCaseString(tableName)
-		if settings.IsFileNameFormatSnakeCase() {
-			fileName = strcase.ToSnake(fileName)
-		}
-
-		err = out.Write(fileName, content)
-		if err != nil {
-			if !settings.Force {
-				return fmt.Errorf("could not write struct for table %q: %v", table.Name, err)
-			}
-			fmt.Printf("could not write struct for table %q: %v\n", table.Name, err)
-		}
+	if err != nil {
+		return err
 	}
 
 	fmt.Println("done!")
@@ -88,37 +61,105 @@ func Run(settings *settings.Settings, db database.Database, out output.Writer) (
 	return nil
 }
 
-type columnInfo struct {
-	isNullable          bool
-	isTemporal          bool
-	isNullablePrimitive bool
-	isNullableTemporal  bool
+func RunTableToGoServices(
+	settings *configurations.Settings,
+	sourceDatabase database.Database,
+	out output.Writer,
+	sourceDatabaseTables []*database.Table) error {
+
+	if err := sourceDatabase.PrepareGetColumnsOfTableStmt(); err != nil {
+		return fmt.Errorf("could not prepare the get-column-statement: %v", err)
+	}
+
+	for _, sourceDatabaseTable := range sourceDatabaseTables {
+
+		if settings.Verbose {
+			fmt.Printf("> processing sourceDatabaseTable %q\r\n", sourceDatabaseTable.Name)
+		}
+
+		if err := sourceDatabase.GetColumnsOfTable(sourceDatabaseTable); err != nil {
+			if !settings.Force {
+				return fmt.Errorf("could not get columns of sourceDatabaseTable %q: %v", sourceDatabaseTable.Name, err)
+			}
+			fmt.Printf("could not get columns of sourceDatabaseTable %q: %v\n", sourceDatabaseTable.Name, err)
+			continue
+		}
+
+		if settings.Verbose {
+			fmt.Printf("\t> number of columns: %v\r\n", len(sourceDatabaseTable.Columns))
+		}
+
+		tableName, content, err :=
+			createTableStructString(
+				settings,
+				sourceDatabase,
+				sourceDatabaseTable)
+
+		if err != nil {
+			if !settings.Force {
+				return fmt.Errorf("could not create string for sourceDatabaseTable %q: %v", sourceDatabaseTable.Name, err)
+			}
+			fmt.Printf("could not create string for sourceDatabaseTable %q: %v\n", sourceDatabaseTable.Name, err)
+			continue
+		}
+
+		fileName :=
+			CamelCaseString(
+				tableName)
+
+		if settings.IsFileNameFormatSnakeCase() {
+			fileName = strcase.ToSnake(fileName)
+		}
+
+		err = out.Write(
+			fileName,
+			content)
+
+		if err != nil {
+			if !settings.Force {
+				return fmt.Errorf("could not write struct for sourceDatabaseTable %q: %v", sourceDatabaseTable.Name, err)
+			}
+			fmt.Printf("could not write struct for sourceDatabaseTable %q: %v\n", sourceDatabaseTable.Name, err)
+		}
+	}
+	return nil
 }
 
-func (c columnInfo) hasTrue() bool {
-	return c.isNullable || c.isTemporal || c.isNullableTemporal || c.isNullablePrimitive
-}
-
-func createTableStructString(settings *settings.Settings, db database.Database, table *database.Table) (string, string, error) {
+func createTableStructString(
+	settings *configurations.Settings,
+	sourceDatabase database.Database,
+	sourceDatabaseTable *database.Table) (
+	string,
+	string,
+	error) {
 
 	var structFields strings.Builder
-	tableName := strings.Title(settings.Prefix + table.Name + settings.Suffix)
+	tableName := strings.Title(
+		settings.Prefix +
+			sourceDatabaseTable.Name +
+			settings.Suffix)
+
 	// Replace any whitespace with underscores
 	tableName = strings.Map(replaceSpace, tableName)
 	if settings.IsOutputFormatCamelCase() {
 		tableName = CamelCaseString(tableName)
 	}
 
-	// Check that the table name doesn't contain any invalid characters for Go variables
+	// Check that the sourceDatabaseTable name doesn't contain any invalid characters for Go variables
 	if !validVariableName(tableName) {
-		return "", "", fmt.Errorf("table name %q contains invalid characters", table.Name)
+		return "", "", fmt.Errorf("sourceDatabaseTable name %q contains invalid characters", sourceDatabaseTable.Name)
 	}
 
-	columnInfo := columnInfo{}
+	columnInfo := configurations.ColumnInfo{}
 	columns := map[string]struct{}{}
 
-	for _, column := range table.Columns {
-		columnName, err := formatColumnName(settings, column.Name, table.Name)
+	for _, column := range sourceDatabaseTable.Columns {
+
+		columnName, err := formatColumnName(
+			settings,
+			column.Name,
+			sourceDatabaseTable.Name)
+
 		if err != nil {
 			return "", "", err
 		}
@@ -127,6 +168,7 @@ func createTableStructString(settings *settings.Settings, db database.Database, 
 		// then the sql returns multiple rows per column name.
 		// Therefore we check if we already added a column with
 		// that name to the struct, if so, skip.
+
 		if _, ok := columns[columnName]; ok {
 			continue
 		}
@@ -136,24 +178,24 @@ func createTableStructString(settings *settings.Settings, db database.Database, 
 			fmt.Printf("\t\t> %v\r\n", column.Name)
 		}
 
-		columnType, col := mapDbColumnTypeToGoType(settings, db, column)
+		columnType, col := mapDbColumnTypeToGoType(settings, sourceDatabase, column)
 
 		// save that we saw types of columns at least once
-		if !columnInfo.isTemporal {
-			columnInfo.isTemporal = col.isTemporal
+		if !columnInfo.IsTemporal {
+			columnInfo.IsTemporal = col.IsTemporal
 		}
-		if !columnInfo.isNullableTemporal {
-			columnInfo.isNullableTemporal = col.isNullableTemporal
+		if !columnInfo.IsNullableTemporal {
+			columnInfo.IsNullableTemporal = col.IsNullableTemporal
 		}
-		if !columnInfo.isNullablePrimitive {
-			columnInfo.isNullablePrimitive = col.isNullablePrimitive
+		if !columnInfo.IsNullablePrimitive {
+			columnInfo.IsNullablePrimitive = col.IsNullablePrimitive
 		}
 
 		structFields.WriteString(columnName)
 		structFields.WriteString(" ")
 		structFields.WriteString(columnType)
 		structFields.WriteString(" ")
-		structFields.WriteString(taggers.GenerateTag(db, column))
+		structFields.WriteString(taggers.GenerateTag(sourceDatabase, column))
 		structFields.WriteString("\n")
 	}
 
@@ -169,7 +211,7 @@ func createTableStructString(settings *settings.Settings, db database.Database, 
 	fileContent.WriteString("\n\n")
 
 	// write imports
-	generateImports(&fileContent, settings, db, columnInfo)
+	generateImports(&fileContent, settings, sourceDatabase, columnInfo)
 
 	// write struct with fields
 	fileContent.WriteString("type ")
@@ -181,23 +223,27 @@ func createTableStructString(settings *settings.Settings, db database.Database, 
 	return tableName, fileContent.String(), nil
 }
 
-func generateImports(content *strings.Builder, settings *settings.Settings, db database.Database, columnInfo columnInfo) {
+func generateImports(
+	content *strings.Builder,
+	settings *configurations.Settings,
+	db database.Database,
+	columnInfo configurations.ColumnInfo) {
 
-	if !columnInfo.hasTrue() && !settings.IsMastermindStructableRecorder {
+	if !columnInfo.HasTrue() && !settings.IsMastermindStructableRecorder {
 		return
 	}
 
 	content.WriteString("import (\n")
 
-	if columnInfo.isNullablePrimitive && settings.IsNullTypeSQL() {
+	if columnInfo.IsNullablePrimitive && settings.IsNullTypeSQL() {
 		content.WriteString("\t\"database/sql\"\n")
 	}
 
-	if columnInfo.isTemporal {
+	if columnInfo.IsTemporal {
 		content.WriteString("\t\"time\"\n")
 	}
 
-	if columnInfo.isNullableTemporal && settings.IsNullTypeSQL() {
+	if columnInfo.IsNullableTemporal && settings.IsNullTypeSQL() {
 		content.WriteString("\t\n")
 		content.WriteString(db.GetDriverImportLibrary())
 		content.WriteString("\n")
@@ -210,34 +256,39 @@ func generateImports(content *strings.Builder, settings *settings.Settings, db d
 	content.WriteString(")\n\n")
 }
 
-func mapDbColumnTypeToGoType(s *settings.Settings, db database.Database, column database.Column) (goType string, columnInfo columnInfo) {
+func mapDbColumnTypeToGoType(
+	s *configurations.Settings,
+	db database.Database,
+	column database.Column) (
+	goType string,
+	columnInfo configurations.ColumnInfo) {
 	if db.IsString(column) || db.IsText(column) {
 		goType = "string"
 		if db.IsNullable(column) {
 			goType = getNullType(s, "*string", "sql.NullString")
-			columnInfo.isNullable = true
+			columnInfo.IsNullable = true
 		}
 	} else if db.IsInteger(column) {
 		goType = "int"
 		if db.IsNullable(column) {
 			goType = getNullType(s, "*int", "sql.NullInt64")
-			columnInfo.isNullable = true
+			columnInfo.IsNullable = true
 		}
 	} else if db.IsFloat(column) {
 		goType = "float64"
 		if db.IsNullable(column) {
 			goType = getNullType(s, "*float64", "sql.NullFloat64")
-			columnInfo.isNullable = true
+			columnInfo.IsNullable = true
 		}
 	} else if db.IsTemporal(column) {
 		if !db.IsNullable(column) {
 			goType = "time.Time"
-			columnInfo.isTemporal = true
+			columnInfo.IsTemporal = true
 		} else {
 			goType = getNullType(s, "*time.Time", db.GetTemporalDriverDataType())
-			columnInfo.isTemporal = s.Null == settings.NullTypeNative
-			columnInfo.isNullableTemporal = true
-			columnInfo.isNullable = true
+			columnInfo.IsTemporal = s.Null == configurations.NullTypeNative
+			columnInfo.IsNullableTemporal = true
+			columnInfo.IsNullable = true
 		}
 	} else {
 		// TODO handle special data types
@@ -246,19 +297,25 @@ func mapDbColumnTypeToGoType(s *settings.Settings, db database.Database, column 
 			goType = "bool"
 			if db.IsNullable(column) {
 				goType = getNullType(s, "*bool", "sql.NullBool")
-				columnInfo.isNullable = true
+				columnInfo.IsNullable = true
 			}
 		default:
 			goType = getNullType(s, "*string", "sql.NullString")
 		}
 	}
 
-	columnInfo.isNullablePrimitive = columnInfo.isNullable && !db.IsTemporal(column)
+	columnInfo.IsNullablePrimitive = columnInfo.IsNullable && !db.IsTemporal(column)
 
 	return goType, columnInfo
 }
 
-func CamelCaseString(s string) string {
+//TODO move this to string_editor_services helper
+
+func CamelCaseString(
+	s string) string {
+
+	caseTitle := cases.Title(language.English)
+
 	if s == "" {
 		return s
 	}
@@ -266,24 +323,30 @@ func CamelCaseString(s string) string {
 	splitted := strings.Split(s, "_")
 
 	if len(splitted) == 1 {
-		return strings.Title(s)
+		caseTitle.String(s)
+		return caseTitle.String(s)
+		//return strings.ToTitle(s)
 	}
 
 	var cc string
 	for _, part := range splitted {
-		cc += strings.Title(strings.ToLower(part))
+		cc += caseTitle.String((strings.ToLower(part)))
 	}
 	return cc
 }
 
-func getNullType(settings *settings.Settings, primitive string, sql string) string {
+func getNullType(
+	settings *configurations.Settings,
+	primitive string,
+	sql string) string {
 	if settings.IsNullTypeSQL() {
 		return sql
 	}
 	return primitive
 }
 
-func toInitialisms(s string) string {
+func toInitialisms(
+	s string) string {
 	for _, substr := range initialisms {
 		idx := indexCaseInsensitive(s, substr)
 		if idx == -1 {
@@ -295,14 +358,16 @@ func toInitialisms(s string) string {
 	return s
 }
 
-func indexCaseInsensitive(s, substr string) int {
+func indexCaseInsensitive(
+	s, substr string) int {
 	s, substr = strings.ToLower(s), strings.ToLower(substr)
 	return strings.Index(s, substr)
 }
 
 // ValidVariableName checks for the existence of any characters
 // outside of Unicode letters, numbers and underscore.
-func validVariableName(s string) bool {
+func validVariableName(
+	s string) bool {
 	for _, r := range s {
 		if !(unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_') {
 			return false
@@ -313,7 +378,8 @@ func validVariableName(s string) bool {
 
 // ReplaceSpace swaps any Unicode space characters for underscores
 // to create valid Go identifiers
-func replaceSpace(r rune) rune {
+func replaceSpace(
+	r rune) rune {
 	if unicode.IsSpace(r) || r == '\u200B' {
 		return '_'
 	}
@@ -322,7 +388,12 @@ func replaceSpace(r rune) rune {
 
 // FormatColumnName checks for invalid characters and transforms a column name
 // according to the provided settings.
-func formatColumnName(settings *settings.Settings, column, table string) (string, error) {
+func formatColumnName(
+	settings *configurations.Settings,
+	column,
+	table string) (
+	string,
+	error) {
 
 	// Replace any whitespace with underscores
 	columnName := strings.Map(replaceSpace, column)

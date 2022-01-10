@@ -3,10 +3,9 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"github.com/OntoLedgy/storage_interop_services/code/object_model/configurations"
 	"net/url"
 	"strings"
-
-	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/pkg/settings"
 )
 
 // SQLite implemenmts the Database interface with help of generalDatabase
@@ -15,7 +14,7 @@ type SQLite struct {
 }
 
 // NewSQLite creates a new SQLite database
-func NewSQLite(s *settings.Settings) *SQLite {
+func NewSQLite(s *configurations.Settings) *SQLite {
 	return &SQLite{
 		GeneralDatabase: &GeneralDatabase{
 			Settings: s,

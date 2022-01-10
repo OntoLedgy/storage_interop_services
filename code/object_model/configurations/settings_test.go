@@ -1,4 +1,4 @@
-package settings
+package configurations
 
 import (
 	"os"
@@ -11,18 +11,18 @@ import (
 func TestSettings_Verify(t *testing.T) {
 	tests := []struct {
 		desc     string
-		settings func() *Settings
+		settings func() *DatabaseToGoSettings
 		isError  assert.ErrorAssertionFunc
 	}{
 		{
 			desc:     "default settings produce no error",
-			settings: New,
+			settings: CreateNewSettings,
 			isError:  assert.NoError,
 		},
 		{
 			desc: "wrong output file path produces error",
-			settings: func() *Settings {
-				s := New()
+			settings: func() *DatabaseToGoSettings {
+				s := CreateNewSettings()
 				s.OutputFilePath = ""
 				return s
 			},
@@ -30,8 +30,8 @@ func TestSettings_Verify(t *testing.T) {
 		},
 		{
 			desc: "output file path with file produces error",
-			settings: func() *Settings {
-				s := New()
+			settings: func() *DatabaseToGoSettings {
+				s := CreateNewSettings()
 				ex, err := os.Executable()
 				assert.Nil(t, err)
 				s.OutputFilePath = ex
@@ -41,8 +41,8 @@ func TestSettings_Verify(t *testing.T) {
 		},
 		{
 			desc: "empty package name produces error",
-			settings: func() *Settings {
-				s := New()
+			settings: func() *DatabaseToGoSettings {
+				s := CreateNewSettings()
 				s.PackageName = ""
 				return s
 			},
@@ -50,8 +50,8 @@ func TestSettings_Verify(t *testing.T) {
 		},
 		{
 			desc: "set v-verbose mode activates verbose mode without error",
-			settings: func() *Settings {
-				s := New()
+			settings: func() *DatabaseToGoSettings {
+				s := CreateNewSettings()
 				s.VVerbose = true
 				return s
 			},
@@ -70,18 +70,18 @@ func TestSettings_Verify(t *testing.T) {
 func TestSettings_IsNullTypeSQL(t *testing.T) {
 	tests := []struct {
 		desc     string
-		settings func() *Settings
+		settings func() *DatabaseToGoSettings
 		expected bool
 	}{
 		{
 			desc:     "in default settings sql NULL type is activated",
-			settings: New,
+			settings: CreateNewSettings,
 			expected: true,
 		},
 		{
 			desc: "explicit enabled sql NULL type ativates sql NULL type",
-			settings: func() *Settings {
-				s := New()
+			settings: func() *DatabaseToGoSettings {
+				s := CreateNewSettings()
 				s.Null = NullTypeSQL
 				return s
 			},
@@ -89,8 +89,8 @@ func TestSettings_IsNullTypeSQL(t *testing.T) {
 		},
 		{
 			desc: "native NULL type deativates sql NULL type",
-			settings: func() *Settings {
-				s := New()
+			settings: func() *DatabaseToGoSettings {
+				s := CreateNewSettings()
 				s.Null = NullTypeNative
 				return s
 			},
@@ -98,8 +98,8 @@ func TestSettings_IsNullTypeSQL(t *testing.T) {
 		},
 		{
 			desc: "primitve NULL type deativates sql NULL type",
-			settings: func() *Settings {
-				s := New()
+			settings: func() *DatabaseToGoSettings {
+				s := CreateNewSettings()
 				s.Null = NullTypePrimitive
 				return s
 			},
@@ -107,8 +107,8 @@ func TestSettings_IsNullTypeSQL(t *testing.T) {
 		},
 		{
 			desc: "any other NULL type deativates sql NULL type",
-			settings: func() *Settings {
-				s := New()
+			settings: func() *DatabaseToGoSettings {
+				s := CreateNewSettings()
 				s.Null = NullType("any")
 				return s
 			},
@@ -127,18 +127,18 @@ func TestSettings_IsNullTypeSQL(t *testing.T) {
 func TestSettings_ShouldInitialism(t *testing.T) {
 	tests := []struct {
 		desc     string
-		settings func() *Settings
+		settings func() *DatabaseToGoSettings
 		expected bool
 	}{
 		{
 			desc:     "in default settings initialism is activated",
-			settings: New,
+			settings: CreateNewSettings,
 			expected: true,
 		},
 		{
 			desc: "explicit enabled initialism ativates initialism",
-			settings: func() *Settings {
-				s := New()
+			settings: func() *DatabaseToGoSettings {
+				s := CreateNewSettings()
 				s.NoInitialism = false
 				return s
 			},
@@ -146,8 +146,8 @@ func TestSettings_ShouldInitialism(t *testing.T) {
 		},
 		{
 			desc: "disabled initialism deactivates initialism",
-			settings: func() *Settings {
-				s := New()
+			settings: func() *DatabaseToGoSettings {
+				s := CreateNewSettings()
 				s.NoInitialism = true
 				return s
 			},
@@ -166,18 +166,18 @@ func TestSettings_ShouldInitialism(t *testing.T) {
 func TestSettings_IsOutputFormatCamelCase(t *testing.T) {
 	tests := []struct {
 		desc     string
-		settings func() *Settings
+		settings func() *DatabaseToGoSettings
 		expected bool
 	}{
 		{
 			desc:     "in default settings camel case is activated",
-			settings: New,
+			settings: CreateNewSettings,
 			expected: true,
 		},
 		{
 			desc: "explicit enabled camel case ativates initialism",
-			settings: func() *Settings {
-				s := New()
+			settings: func() *DatabaseToGoSettings {
+				s := CreateNewSettings()
 				s.OutputFormat = OutputFormatCamelCase
 				return s
 			},
@@ -185,8 +185,8 @@ func TestSettings_IsOutputFormatCamelCase(t *testing.T) {
 		},
 		{
 			desc: "disabled camel case deactivates camel case",
-			settings: func() *Settings {
-				s := New()
+			settings: func() *DatabaseToGoSettings {
+				s := CreateNewSettings()
 				s.OutputFormat = OutputFormatOriginal
 				return s
 			},
@@ -194,8 +194,8 @@ func TestSettings_IsOutputFormatCamelCase(t *testing.T) {
 		},
 		{
 			desc: "any other output format deativates camel case",
-			settings: func() *Settings {
-				s := New()
+			settings: func() *DatabaseToGoSettings {
+				s := CreateNewSettings()
 				s.OutputFormat = OutputFormat("any")
 				return s
 			},
@@ -214,18 +214,18 @@ func TestSettings_IsOutputFormatCamelCase(t *testing.T) {
 func TestSettings_IsFileNameFormatSnakeCase(t *testing.T) {
 	tests := []struct {
 		desc     string
-		settings func() *Settings
+		settings func() *DatabaseToGoSettings
 		expected bool
 	}{
 		{
 			desc:     "in default settings camel case will be used",
-			settings: New,
+			settings: CreateNewSettings,
 			expected: false,
 		},
 		{
 			desc: "use snake case",
-			settings: func() *Settings {
-				s := New()
+			settings: func() *DatabaseToGoSettings {
+				s := CreateNewSettings()
 				s.FileNameFormat = FileNameFormatSnakeCase
 				return s
 			},
@@ -233,8 +233,8 @@ func TestSettings_IsFileNameFormatSnakeCase(t *testing.T) {
 		},
 		{
 			desc: "any other output format will converted to camel case",
-			settings: func() *Settings {
-				s := New()
+			settings: func() *DatabaseToGoSettings {
+				s := CreateNewSettings()
 				s.FileNameFormat = FileNameFormat("any")
 				return s
 			},
@@ -254,7 +254,7 @@ func TestDbType_Set(t *testing.T) {
 	tests := []struct {
 		desc     string
 		input    string
-		expected DbType
+		expected DatabaseType
 		isError  assert.ErrorAssertionFunc
 	}{
 		{
@@ -278,7 +278,7 @@ func TestDbType_Set(t *testing.T) {
 		{
 			desc:     "string typed unsupported db type produces error and invalid db type",
 			input:    string("invalid"),
-			expected: DbType("invalid"),
+			expected: DatabaseType("invalid"),
 			isError:  assert.Error,
 		},
 	}
@@ -446,7 +446,7 @@ func TestSprintfSupportedNullTypes(t *testing.T) {
 	}{
 		{
 			desc:     "print all supported NULL types",
-			expected: len(supportedNullTypes),
+			expected: len(SupportedNullTypes),
 		},
 	}
 	for _, test := range tests {

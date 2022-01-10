@@ -2,9 +2,8 @@ package database
 
 import (
 	"fmt"
+	"github.com/OntoLedgy/storage_interop_services/code/object_model/configurations"
 	"strings"
-
-	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/pkg/settings"
 
 	// MySQL database driver
 	_ "github.com/go-sql-driver/mysql"
@@ -16,7 +15,7 @@ type MySQL struct {
 }
 
 // NewMySQL creates a new MySQL database
-func NewMySQL(s *settings.Settings) *MySQL {
+func NewMySQL(s *configurations.Settings) *MySQL {
 	return &MySQL{
 		GeneralDatabase: &GeneralDatabase{
 			Settings: s,

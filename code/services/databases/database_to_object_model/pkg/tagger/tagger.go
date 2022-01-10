@@ -1,11 +1,11 @@
 package tagger
 
 import (
+	"github.com/OntoLedgy/storage_interop_services/code/object_model/configurations"
 	"strings"
 	"sync"
 
 	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/pkg/database"
-	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/pkg/settings"
 )
 
 const (
@@ -29,14 +29,14 @@ type Tagger interface {
 
 // Taggers represents the supported tags to generate.
 type Taggers struct {
-	settings *settings.Settings
+	settings *configurations.Settings
 
 	enabledTags int
 	taggers     map[int]Tagger
 }
 
 // NewTaggers is the constructor function to create the supported taggers.
-func NewTaggers(s *settings.Settings) *Taggers {
+func NewTaggers(s *configurations.Settings) *Taggers {
 	t := &Taggers{
 		settings:    s,
 		enabledTags: tagDb,

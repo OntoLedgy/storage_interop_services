@@ -2,9 +2,8 @@ package database
 
 import (
 	"fmt"
+	"github.com/OntoLedgy/storage_interop_services/code/object_model/configurations"
 	"strings"
-
-	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/pkg/settings"
 
 	// postgres database driver
 	_ "github.com/lib/pq"
@@ -18,7 +17,7 @@ type Postgresql struct {
 }
 
 // NewPostgresql creates a new Postgresql database
-func NewPostgresql(s *settings.Settings) *Postgresql {
+func NewPostgresql(s *configurations.Settings) *Postgresql {
 	return &Postgresql{
 		GeneralDatabase: &GeneralDatabase{
 			Settings: s,

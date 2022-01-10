@@ -2,29 +2,29 @@ package tagger
 
 import (
 	"database/sql"
+	"github.com/OntoLedgy/storage_interop_services/code/object_model/configurations"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/pkg/database"
-	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/pkg/settings"
 )
 
 func TestMastermind_GenerateTag(t *testing.T) {
 	type test struct {
 		desc     string
-		settings func() *settings.Settings
+		settings func() *configurations.DatabaseToGoSettings
 		column   database.Column
 		expected string
 	}
 
-	tests := map[settings.DbType][]test{
-		settings.DbTypePostgresql: {
+	tests := map[configurations.DatabaseType][]test{
+		configurations.DbTypePostgresql: {
 			{
 				desc: "non PK column generates standard Mastermind-tag",
-				settings: func() *settings.Settings {
-					s := settings.New()
-					s.DbType = settings.DbTypePostgresql
+				settings: func() *configurations.DatabaseToGoSettings {
+					s := configurations.CreateNewSettings()
+					s.DbType = configurations.DbTypePostgresql
 					s.TagsNoDb = true
 					s.TagsMastermindStructable = true
 					return s
@@ -36,9 +36,9 @@ func TestMastermind_GenerateTag(t *testing.T) {
 			},
 			{
 				desc: "PK column generates Mastermind-tag with PK indicator",
-				settings: func() *settings.Settings {
-					s := settings.New()
-					s.DbType = settings.DbTypePostgresql
+				settings: func() *configurations.DatabaseToGoSettings {
+					s := configurations.CreateNewSettings()
+					s.DbType = configurations.DbTypePostgresql
 					s.TagsNoDb = true
 					s.TagsMastermindStructable = true
 					return s
@@ -54,9 +54,9 @@ func TestMastermind_GenerateTag(t *testing.T) {
 			},
 			{
 				desc: "PK and AI column generates Mastermind-tag with PK and AI indicator",
-				settings: func() *settings.Settings {
-					s := settings.New()
-					s.DbType = settings.DbTypePostgresql
+				settings: func() *configurations.DatabaseToGoSettings {
+					s := configurations.CreateNewSettings()
+					s.DbType = configurations.DbTypePostgresql
 					s.TagsNoDb = true
 					s.TagsMastermindStructable = true
 					return s
@@ -75,12 +75,12 @@ func TestMastermind_GenerateTag(t *testing.T) {
 				expected: `stbl:"column_name,PRIMARY_KEY,SERIAL,AUTO_INCREMENT"`,
 			},
 		},
-		settings.DbTypeMySQL: {
+		configurations.DbTypeMySQL: {
 			{
 				desc: "non PK column generates standard Mastermind-tag",
-				settings: func() *settings.Settings {
-					s := settings.New()
-					s.DbType = settings.DbTypeMySQL
+				settings: func() *configurations.DatabaseToGoSettings {
+					s := configurations.CreateNewSettings()
+					s.DbType = configurations.DbTypeMySQL
 					s.TagsNoDb = true
 					s.TagsMastermindStructable = true
 					return s
@@ -92,9 +92,9 @@ func TestMastermind_GenerateTag(t *testing.T) {
 			},
 			{
 				desc: "PK column generates Mastermind-tag with PK indicator",
-				settings: func() *settings.Settings {
-					s := settings.New()
-					s.DbType = settings.DbTypeMySQL
+				settings: func() *configurations.DatabaseToGoSettings {
+					s := configurations.CreateNewSettings()
+					s.DbType = configurations.DbTypeMySQL
 					s.TagsNoDb = true
 					s.TagsMastermindStructable = true
 					return s
@@ -107,9 +107,9 @@ func TestMastermind_GenerateTag(t *testing.T) {
 			},
 			{
 				desc: "PK and AI column generates Mastermind-tag with PK and AI indicator",
-				settings: func() *settings.Settings {
-					s := settings.New()
-					s.DbType = settings.DbTypeMySQL
+				settings: func() *configurations.DatabaseToGoSettings {
+					s := configurations.CreateNewSettings()
+					s.DbType = configurations.DbTypeMySQL
 					s.TagsNoDb = true
 					s.TagsMastermindStructable = true
 					return s
@@ -122,12 +122,12 @@ func TestMastermind_GenerateTag(t *testing.T) {
 				expected: `stbl:"column_name,PRIMARY_KEY,SERIAL,AUTO_INCREMENT"`,
 			},
 		},
-		settings.DbTypeSQLite: {
+		configurations.DbTypeSQLite: {
 			{
 				desc: "non PK column generates standard Mastermind-tag",
-				settings: func() *settings.Settings {
-					s := settings.New()
-					s.DbType = settings.DbTypeSQLite
+				settings: func() *configurations.DatabaseToGoSettings {
+					s := configurations.CreateNewSettings()
+					s.DbType = configurations.DbTypeSQLite
 					s.TagsNoDb = true
 					s.TagsMastermindStructable = true
 					return s
@@ -139,9 +139,9 @@ func TestMastermind_GenerateTag(t *testing.T) {
 			},
 			{
 				desc: "PK column generates Mastermind-tag with PK indicator and AI indicator",
-				settings: func() *settings.Settings {
-					s := settings.New()
-					s.DbType = settings.DbTypeSQLite
+				settings: func() *configurations.DatabaseToGoSettings {
+					s := configurations.CreateNewSettings()
+					s.DbType = configurations.DbTypeSQLite
 					s.TagsNoDb = true
 					s.TagsMastermindStructable = true
 					return s
@@ -157,12 +157,12 @@ func TestMastermind_GenerateTag(t *testing.T) {
 
 	tagger := new(Mastermind)
 
-	for dbType := range settings.SupportedDbTypes {
+	for dbType := range configurations.SupportedDbTypes {
 		t.Run(dbType.String(), func(t *testing.T) {
 			tests := tests[dbType]
 			for _, test := range tests {
 				t.Run(test.desc, func(t *testing.T) {
-					db := database.New(test.settings())
+					db := database.New(test.settings().Settings)
 					actual := tagger.GenerateTag(db, test.column)
 					assert.Equal(t, test.expected, actual)
 				})

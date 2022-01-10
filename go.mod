@@ -16,6 +16,7 @@ require (
 	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca
 	github.com/satori/go.uuid v1.2.0
 	github.com/stretchr/testify v1.6.1
+	golang.org/x/text v0.3.7
 )
 
 require (
@@ -26,7 +27,6 @@ require (
 	github.com/stretchr/objx v0.1.0 // indirect
 	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f // indirect
 	golang.org/x/sys v0.0.0-20210423082822-04245dca01da // indirect
-	golang.org/x/text v0.3.7 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200605160147-a5ece683394c // indirect
 )

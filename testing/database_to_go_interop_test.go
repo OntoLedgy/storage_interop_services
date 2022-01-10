@@ -7,6 +7,6 @@ import (
 
 func TestDatabaseToGo(t *testing.T) {
 
-	database_to_object_model.OrchestratePostGreToGoInterOp()
+	database_to_object_model.OrchestrateDatabaseToGoInterOp("sparx_ea")
 
 }
