@@ -1,11 +1,11 @@
 package tagger
 
 import (
+	"github.com/OntoLedgy/storage_interop_services/code/object_model"
 	"github.com/OntoLedgy/storage_interop_services/code/object_model/configurations"
+	"github.com/OntoLedgy/storage_interop_services/code/services/databases/contract"
 	"strings"
 	"sync"
-
-	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/pkg/database"
 )
 
 const (
@@ -24,7 +24,7 @@ var stringPool = sync.Pool{
 
 // Tagger interface for types of struct-tages
 type Tagger interface {
-	GenerateTag(db database.Database, column database.Column) string
+	GenerateTag(db contract.Database, column object_model.Column) string
 }
 
 // Taggers represents the supported tags to generate.
@@ -69,7 +69,7 @@ func (t *Taggers) enableTags() {
 
 // GenerateTag creates based on the enabled tags and the given database and column
 // the tag for the struct field.
-func (t *Taggers) GenerateTag(db database.Database, column database.Column) (tags string) {
+func (t *Taggers) GenerateTag(db contract.Database, column object_model.Column) (tags string) {
 	sb := stringPool.Get().(*strings.Builder)
 	defer func() {
 		sb.Reset()

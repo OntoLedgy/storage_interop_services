@@ -4,12 +4,14 @@ import (
 	"flag"
 	"fmt"
 	"github.com/OntoLedgy/storage_interop_services/code/object_model/configurations"
-	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/pkg/database"
-	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/pkg/output"
+	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/database"
+	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/output/writer"
 	"os"
 )
 
-func OrchestrateDatabaseToGoInterOp(databaseName string) {
+func OrchestrateDatabaseToGoInterOp(
+	databaseName string,
+	outputFilePath string) {
 
 	//TODO - Add config file here.
 
@@ -21,7 +23,7 @@ func OrchestrateDatabaseToGoInterOp(databaseName string) {
 		Port:           "5432",
 		DbType:         "pg",
 		PackageName:    databaseName,
-		OutputFilePath: "D:\\S\\go\\src\\github.com\\OntoLedgy\\domain_ontologies\\code\\data_models\\" + databaseName + "\\",
+		OutputFilePath: outputFilePath + databaseName + "\\",
 		Schema:         "public",
 	}
 
@@ -54,9 +56,9 @@ func Orchestrate_Cli(databaseToGoSettings *configurations.DatabaseToGoSettings) 
 		os.Exit(1)
 	}
 
-	writer := output.NewFileWriter(databaseToGoSettings.OutputFilePath)
+	fileWriter := writer.NewFileWriter(databaseToGoSettings.OutputFilePath)
 
-	if err := RunDatabaseToGoServices(databaseToGoSettings.Settings, db, writer); err != nil {
+	if err := RunDatabaseToGoServices(databaseToGoSettings.Settings, db, fileWriter); err != nil {
 		fmt.Printf("run error: %v\n", err)
 		os.Exit(1)
 	}

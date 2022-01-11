@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"github.com/OntoLedgy/storage_interop_services/code/object_model"
 	"github.com/OntoLedgy/storage_interop_services/code/object_model/configurations"
 	"net/url"
 	"strings"
@@ -10,13 +11,13 @@ import (
 
 // SQLite implemenmts the Database interface with help of generalDatabase
 type SQLite struct {
-	*GeneralDatabase
+	*GeneralDatabases
 }
 
 // NewSQLite creates a new SQLite database
 func NewSQLite(s *configurations.Settings) *SQLite {
 	return &SQLite{
-		GeneralDatabase: &GeneralDatabase{
+		GeneralDatabases: &GeneralDatabases{
 			Settings: s,
 			driver:   dbTypeToDriverMap[s.DbType],
 		},
@@ -24,7 +25,7 @@ func NewSQLite(s *configurations.Settings) *SQLite {
 }
 
 func (s *SQLite) Connect() (err error) {
-	return s.GeneralDatabase.Connect(s.DSN())
+	return s.GeneralDatabases.Connect(s.DSN())
 }
 
 func (s *SQLite) DSN() string {
@@ -50,7 +51,7 @@ func (s *SQLite) GetDriverImportLibrary() string {
 	return `"github.com/mattn/go-sqlite3"`
 }
 
-func (s *SQLite) GetTables() (tables []*Table, err error) {
+func (s *SQLite) GetTables() (tables []*object_model.Table, err error) {
 
 	err = s.Select(&tables, `
 		SELECT name AS table_name
@@ -73,7 +74,7 @@ func (s *SQLite) PrepareGetColumnsOfTableStmt() (err error) {
 	return nil
 }
 
-func (s *SQLite) GetColumnsOfTable(table *Table) (err error) {
+func (s *SQLite) GetColumnsOfTable(table *object_model.Table) (err error) {
 
 	rows, err := s.Queryx(`
 		SELECT * 
@@ -113,7 +114,7 @@ func (s *SQLite) GetColumnsOfTable(table *Table) (err error) {
 			isPrimaryKey = "PK"
 		}
 
-		table.Columns = append(table.Columns, Column{
+		table.Columns = append(table.Columns, object_model.Column{
 			OrdinalPosition:        col.CID,
 			Name:                   col.Name,
 			DataType:               col.DataType,
@@ -132,11 +133,11 @@ func (s *SQLite) GetColumnsOfTable(table *Table) (err error) {
 	return nil
 }
 
-func (s *SQLite) IsPrimaryKey(column Column) bool {
+func (s *SQLite) IsPrimaryKey(column object_model.Column) bool {
 	return column.ColumnKey == "PK"
 }
 
-func (s *SQLite) IsAutoIncrement(column Column) bool {
+func (s *SQLite) IsAutoIncrement(column object_model.Column) bool {
 	return column.ColumnKey == "PK"
 }
 
@@ -146,7 +147,7 @@ func (s *SQLite) GetStringDatatypes() []string {
 	}
 }
 
-func (s *SQLite) IsString(column Column) bool {
+func (s *SQLite) IsString(column object_model.Column) bool {
 	return s.IsStringInSlice(column.DataType, s.GetStringDatatypes())
 }
 
@@ -156,7 +157,7 @@ func (s *SQLite) GetTextDatatypes() []string {
 	}
 }
 
-func (s *SQLite) IsText(column Column) bool {
+func (s *SQLite) IsText(column object_model.Column) bool {
 	return s.IsStringInSlice(column.DataType, s.GetTextDatatypes())
 }
 
@@ -166,7 +167,7 @@ func (s *SQLite) GetIntegerDatatypes() []string {
 	}
 }
 
-func (s *SQLite) IsInteger(column Column) bool {
+func (s *SQLite) IsInteger(column object_model.Column) bool {
 	return s.IsStringInSlice(column.DataType, s.GetIntegerDatatypes())
 }
 
@@ -177,7 +178,7 @@ func (s *SQLite) GetFloatDatatypes() []string {
 	}
 }
 
-func (s *SQLite) IsFloat(column Column) bool {
+func (s *SQLite) IsFloat(column object_model.Column) bool {
 	return s.IsStringInSlice(column.DataType, s.GetFloatDatatypes())
 }
 
@@ -185,7 +186,8 @@ func (s *SQLite) GetTemporalDatatypes() []string {
 	return []string{}
 }
 
-func (s *SQLite) IsTemporal(column Column) bool {
+func (s *SQLite) IsTemporal(column object_model.Column) bool {
+	//TODO fix this, column not used.
 	return false
 }
 

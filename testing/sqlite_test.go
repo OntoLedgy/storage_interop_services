@@ -1,7 +1,8 @@
-package database
+package testing
 
 import (
 	"github.com/OntoLedgy/storage_interop_services/code/object_model/configurations"
+	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/database"
 	"net/url"
 	"testing"
 
@@ -120,7 +121,7 @@ func TestSQLite_DSN(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.desc, func(t *testing.T) {
-			db := NewSQLite(test.settings())
+			db := database.NewSQLite(test.settings())
 			dsn := db.DSN()
 
 			actual, err := url.Parse(dsn)

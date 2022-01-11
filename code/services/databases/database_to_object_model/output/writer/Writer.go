@@ -1,6 +1,7 @@
-package output
+package writer
 
 import (
+	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/output/decorator"
 	"io/ioutil"
 	"path"
 )
@@ -10,27 +11,10 @@ const (
 	FileWriterExtension = ".go"
 )
 
-// Writer represents an interface to write the produced struct content.
-type Writer interface {
-	Write(tableName string,
-		content string) error
-}
-
 // FileWriter is a writer that writes to a file given by the path and the table name.
 type FileWriter struct {
 	path       string
-	decorators []Decorator
-}
-
-// NewFileWriter constructs a new FileWriter.
-func NewFileWriter(path string) *FileWriter {
-	return &FileWriter{
-		path: path,
-		decorators: []Decorator{
-			FormatDecorator{},
-			ImportDecorator{},
-		},
-	}
+	decorators []decorator.Decorator
 }
 
 // Write is the implementation of the Writer interface. The FilerWriter writes
@@ -56,9 +40,12 @@ func (w FileWriter) Write(
 }
 
 // decorate applies some decorations like formatting and empty import removal.
-func (w FileWriter) decorate(content string) (decorated string, err error) {
-	for _, decorator := range w.decorators {
-		content, err = decorator.Decorate(content)
+func (w FileWriter) decorate(
+	content string) (
+	decorated string,
+	err error) {
+	for _, fileDecorator := range w.decorators {
+		content, err = fileDecorator.Decorate(content)
 		if err != nil {
 			return content, err
 		}

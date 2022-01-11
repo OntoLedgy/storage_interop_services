@@ -7,6 +7,10 @@ import (
 
 func TestDatabaseToGo(t *testing.T) {
 
-	database_to_object_model.OrchestrateDatabaseToGoInterOp("sparx_ea")
+	outputFolderPath := "D:\\S\\go\\src\\github.com\\OntoLedgy\\domain_ontologies\\code\\data_models\\data_modelling_tools\\"
+
+	database_to_object_model.OrchestrateDatabaseToGoInterOp(
+		"sparx_ea",
+		outputFolderPath)
 
 }

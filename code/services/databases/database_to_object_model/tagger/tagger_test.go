@@ -1,19 +1,19 @@
 package tagger
 
 import (
+	"github.com/OntoLedgy/storage_interop_services/code/object_model"
 	"github.com/OntoLedgy/storage_interop_services/code/object_model/configurations"
+	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/database"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/pkg/database"
 )
 
 func TestTaggers_GenerateTags(t *testing.T) {
 	tests := []struct {
 		desc     string
 		settings func() *configurations.DatabaseToGoSettings
-		column   database.Column
+		column   object_model.Column
 		expected string
 	}{
 		{
@@ -23,7 +23,7 @@ func TestTaggers_GenerateTags(t *testing.T) {
 				s.TagsNoDb = false
 				return s
 			},
-			column: database.Column{
+			column: object_model.Column{
 				Name: "column_name",
 			},
 			expected: "`db:\"column_name\"`",
@@ -35,7 +35,7 @@ func TestTaggers_GenerateTags(t *testing.T) {
 				s.TagsNoDb = true
 				return s
 			},
-			column:   database.Column{},
+			column:   object_model.Column{},
 			expected: "",
 		},
 		{
@@ -46,7 +46,7 @@ func TestTaggers_GenerateTags(t *testing.T) {
 				s.TagsMastermindStructable = true
 				return s
 			},
-			column: database.Column{
+			column: object_model.Column{
 				Name: "column_name",
 			},
 			expected: "`db:\"column_name\" stbl:\"column_name\"`",
@@ -59,7 +59,7 @@ func TestTaggers_GenerateTags(t *testing.T) {
 				s.TagsMastermindStructable = true
 				return s
 			},
-			column: database.Column{
+			column: object_model.Column{
 				Name: "column_name",
 			},
 			expected: "`stbl:\"column_name\"`",
@@ -72,7 +72,7 @@ func TestTaggers_GenerateTags(t *testing.T) {
 				s.TagsMastermindStructableOnly = true
 				return s
 			},
-			column: database.Column{
+			column: object_model.Column{
 				Name: "column_name",
 			},
 			expected: "`stbl:\"column_name\"`",

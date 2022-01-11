@@ -1,6 +1,7 @@
-package output
+package writer
 
 import (
+	"github.com/OntoLedgy/storage_interop_services/code/object_model"
 	"os"
 	"path"
 	"testing"
@@ -18,7 +19,7 @@ func TestFileWriter_Write(t *testing.T) {
 		{
 			desc:      "valid table name and valid content should write a file",
 			tableName: "Bar",
-			content:   "package dto\ntype Bar struct {\nID int `db:\"id\"`\n}",
+			content:   "package " + object_model.DefaultPacakgeName + "\ntype Bar struct {\nID int `db:\"id\"`\n}",
 			isError:   assert.NoError,
 		},
 		{

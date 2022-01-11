@@ -1,63 +1,14 @@
-package database_to_object_model
+package testing
 
 import (
+	"github.com/OntoLedgy/storage_interop_services/code/object_model"
 	"github.com/OntoLedgy/storage_interop_services/code/object_model/configurations"
+	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model"
+	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/database"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-
-	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/pkg/database"
 )
-
-type mockDb struct {
-	mock.Mock
-	database.Database
-
-	tables []*database.Table
-}
-
-func newMockDb(db database.Database) *mockDb {
-	return &mockDb{Database: db}
-}
-
-func (db *mockDb) Connect() (err error) {
-	db.Called()
-	return nil
-}
-
-func (db *mockDb) Close() (err error) {
-	db.Called()
-	return nil
-}
-
-func (db *mockDb) GetTables() (tables []*database.Table, err error) {
-	db.Called()
-	return db.tables, nil
-}
-
-func (db *mockDb) PrepareGetColumnsOfTableStmt() (err error) {
-	db.Called()
-	return nil
-}
-
-func (db *mockDb) GetColumnsOfTable(table *database.Table) (err error) {
-	db.Called(table)
-	return nil
-}
-
-type mockWriter struct {
-	mock.Mock
-}
-
-func newMockWriter() *mockWriter {
-	return &mockWriter{}
-}
-
-func (w *mockWriter) Write(tableName string, content string) error {
-	w.Called(tableName, content)
-	return nil
-}
 
 func TestCamelCaseString(t *testing.T) {
 	tests := []struct {
@@ -83,7 +34,7 @@ func TestCamelCaseString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
-			actual := CamelCaseString(tt.input)
+			actual := database_to_object_model.CamelCaseString(tt.input)
 			assert.Equal(t, tt.expected, actual, "test case input: "+tt.input)
 		})
 	}
@@ -138,7 +89,7 @@ func TestToInitialisms(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.desc, func(t *testing.T) {
-			actual := toInitialisms(tt.input)
+			actual := database_to_object_model.ToInitialisms(tt.input)
 			assert.Equal(t, tt.expected, actual, "test case input: "+tt.input)
 		})
 	}
@@ -164,9 +115,9 @@ func TestRun_StringTextColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name",
@@ -190,10 +141,10 @@ func TestRun_StringTextColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\ntype TestTable struct {\nColumnName string `db:\"column_name\"`\n}",
+								"package default_package\n\ntype TestTable struct {\nColumnName string `db:\"column_name\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -203,9 +154,9 @@ func TestRun_StringTextColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name",
@@ -230,10 +181,10 @@ func TestRun_StringTextColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable struct {\nColumnName sql.NullString `db:\"column_name\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable struct {\nColumnName sql.NullString `db:\"column_name\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -244,9 +195,9 @@ func TestRun_StringTextColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name",
@@ -271,10 +222,10 @@ func TestRun_StringTextColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\nimport (\n)\n\ntype TestTable struct {\nColumnName *string `db:\"column_name\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n)\n\ntype TestTable struct {\nColumnName *string `db:\"column_name\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -284,9 +235,9 @@ func TestRun_StringTextColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name_1",
@@ -316,10 +267,10 @@ func TestRun_StringTextColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable struct {\nColumnName1 sql.NullString `db:\"column_name_1\"`\nColumnName2 string `db:\"column_name_2\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable struct {\nColumnName1 sql.NullString `db:\"column_name_1\"`\nColumnName2 string `db:\"column_name_2\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -330,9 +281,9 @@ func TestRun_StringTextColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name_1",
@@ -362,10 +313,10 @@ func TestRun_StringTextColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\nimport (\n)\n\ntype TestTable struct {\nColumnName1 *string `db:\"column_name_1\"`\nColumnName2 string `db:\"column_name_2\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n)\n\ntype TestTable struct {\nColumnName1 *string `db:\"column_name_1\"`\nColumnName2 string `db:\"column_name_2\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -375,9 +326,9 @@ func TestRun_StringTextColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table1 := &database.Table{
+						table1 := &object_model.Table{
 							Name: "test_table_1",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name_1",
@@ -391,9 +342,9 @@ func TestRun_StringTextColumns(t *testing.T) {
 								},
 							},
 						}
-						table2 := &database.Table{
+						table2 := &object_model.Table{
 							Name: "test_table_2",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name_1",
@@ -424,15 +375,15 @@ func TestRun_StringTextColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable1",
-								"package dto\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable1 struct {\nColumnName1 sql.NullString `db:\"column_name_1\"`\nColumnName2 string `db:\"column_name_2\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable1 struct {\nColumnName1 sql.NullString `db:\"column_name_1\"`\nColumnName2 string `db:\"column_name_2\"`\n}",
 							).
 							On(
 								"Write",
 								"TestTable2",
-								"package dto\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable2 struct {\nColumnName1 string `db:\"column_name_1\"`\nColumnName2 sql.NullString `db:\"column_name_2\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable2 struct {\nColumnName1 string `db:\"column_name_1\"`\nColumnName2 sql.NullString `db:\"column_name_2\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 				})
@@ -460,9 +411,9 @@ func TestRun_IntegerColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name",
@@ -486,10 +437,10 @@ func TestRun_IntegerColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\ntype TestTable struct {\nColumnName int `db:\"column_name\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\ntype TestTable struct {\nColumnName int `db:\"column_name\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -499,9 +450,9 @@ func TestRun_IntegerColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name",
@@ -526,10 +477,10 @@ func TestRun_IntegerColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable struct {\nColumnName sql.NullInt64 `db:\"column_name\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable struct {\nColumnName sql.NullInt64 `db:\"column_name\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -540,9 +491,9 @@ func TestRun_IntegerColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name",
@@ -567,10 +518,10 @@ func TestRun_IntegerColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\nimport (\n)\n\ntype TestTable struct {\nColumnName *int `db:\"column_name\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n)\n\ntype TestTable struct {\nColumnName *int `db:\"column_name\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -580,9 +531,9 @@ func TestRun_IntegerColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name_1",
@@ -612,10 +563,10 @@ func TestRun_IntegerColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable struct {\nColumnName1 sql.NullInt64 `db:\"column_name_1\"`\nColumnName2 int `db:\"column_name_2\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable struct {\nColumnName1 sql.NullInt64 `db:\"column_name_1\"`\nColumnName2 int `db:\"column_name_2\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -626,9 +577,9 @@ func TestRun_IntegerColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name_1",
@@ -658,10 +609,10 @@ func TestRun_IntegerColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\nimport (\n)\n\ntype TestTable struct {\nColumnName1 *int `db:\"column_name_1\"`\nColumnName2 int `db:\"column_name_2\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n)\n\ntype TestTable struct {\nColumnName1 *int `db:\"column_name_1\"`\nColumnName2 int `db:\"column_name_2\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -671,9 +622,9 @@ func TestRun_IntegerColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table1 := &database.Table{
+						table1 := &object_model.Table{
 							Name: "test_table_1",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name_1",
@@ -687,9 +638,9 @@ func TestRun_IntegerColumns(t *testing.T) {
 								},
 							},
 						}
-						table2 := &database.Table{
+						table2 := &object_model.Table{
 							Name: "test_table_2",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name_1",
@@ -720,15 +671,15 @@ func TestRun_IntegerColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable1",
-								"package dto\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable1 struct {\nColumnName1 sql.NullInt64 `db:\"column_name_1\"`\nColumnName2 int `db:\"column_name_2\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable1 struct {\nColumnName1 sql.NullInt64 `db:\"column_name_1\"`\nColumnName2 int `db:\"column_name_2\"`\n}",
 							).
 							On(
 								"Write",
 								"TestTable2",
-								"package dto\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable2 struct {\nColumnName1 int `db:\"column_name_1\"`\nColumnName2 sql.NullInt64 `db:\"column_name_2\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable2 struct {\nColumnName1 int `db:\"column_name_1\"`\nColumnName2 sql.NullInt64 `db:\"column_name_2\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 				})
@@ -756,9 +707,9 @@ func TestRun_FloatColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name",
@@ -782,10 +733,10 @@ func TestRun_FloatColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\ntype TestTable struct {\nColumnName float64 `db:\"column_name\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\ntype TestTable struct {\nColumnName float64 `db:\"column_name\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -795,9 +746,9 @@ func TestRun_FloatColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name",
@@ -822,10 +773,10 @@ func TestRun_FloatColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable struct {\nColumnName sql.NullFloat64 `db:\"column_name\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable struct {\nColumnName sql.NullFloat64 `db:\"column_name\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -836,9 +787,9 @@ func TestRun_FloatColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name",
@@ -863,10 +814,10 @@ func TestRun_FloatColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\nimport (\n)\n\ntype TestTable struct {\nColumnName *float64 `db:\"column_name\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n)\n\ntype TestTable struct {\nColumnName *float64 `db:\"column_name\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -876,9 +827,9 @@ func TestRun_FloatColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name_1",
@@ -908,10 +859,10 @@ func TestRun_FloatColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable struct {\nColumnName1 sql.NullFloat64 `db:\"column_name_1\"`\nColumnName2 float64 `db:\"column_name_2\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable struct {\nColumnName1 sql.NullFloat64 `db:\"column_name_1\"`\nColumnName2 float64 `db:\"column_name_2\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -922,9 +873,9 @@ func TestRun_FloatColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name_1",
@@ -954,10 +905,10 @@ func TestRun_FloatColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\nimport (\n)\n\ntype TestTable struct {\nColumnName1 *float64 `db:\"column_name_1\"`\nColumnName2 float64 `db:\"column_name_2\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n)\n\ntype TestTable struct {\nColumnName1 *float64 `db:\"column_name_1\"`\nColumnName2 float64 `db:\"column_name_2\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -967,9 +918,9 @@ func TestRun_FloatColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table1 := &database.Table{
+						table1 := &object_model.Table{
 							Name: "test_table_1",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name_1",
@@ -983,9 +934,9 @@ func TestRun_FloatColumns(t *testing.T) {
 								},
 							},
 						}
-						table2 := &database.Table{
+						table2 := &object_model.Table{
 							Name: "test_table_2",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name_1",
@@ -1016,15 +967,15 @@ func TestRun_FloatColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable1",
-								"package dto\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable1 struct {\nColumnName1 sql.NullFloat64 `db:\"column_name_1\"`\nColumnName2 float64 `db:\"column_name_2\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable1 struct {\nColumnName1 sql.NullFloat64 `db:\"column_name_1\"`\nColumnName2 float64 `db:\"column_name_2\"`\n}",
 							).
 							On(
 								"Write",
 								"TestTable2",
-								"package dto\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable2 struct {\nColumnName1 float64 `db:\"column_name_1\"`\nColumnName2 sql.NullFloat64 `db:\"column_name_2\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable2 struct {\nColumnName1 float64 `db:\"column_name_1\"`\nColumnName2 sql.NullFloat64 `db:\"column_name_2\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 				})
@@ -1052,9 +1003,9 @@ func TestRun_TemporalColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name",
@@ -1078,10 +1029,10 @@ func TestRun_TemporalColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\nimport (\n\t\"time\"\n)\n\ntype TestTable struct {\nColumnName time.Time `db:\"column_name\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n\t\"time\"\n)\n\ntype TestTable struct {\nColumnName time.Time `db:\"column_name\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -1091,9 +1042,9 @@ func TestRun_TemporalColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name",
@@ -1118,10 +1069,10 @@ func TestRun_TemporalColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\nimport (\n\t\n"+db.GetDriverImportLibrary()+"\n)\n\ntype TestTable struct {\nColumnName "+dbType.String()+".NullTime `db:\"column_name\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n\t\n"+db.GetDriverImportLibrary()+"\n)\n\ntype TestTable struct {\nColumnName "+dbType.String()+".NullTime `db:\"column_name\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -1132,9 +1083,9 @@ func TestRun_TemporalColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name",
@@ -1159,10 +1110,10 @@ func TestRun_TemporalColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\nimport (\n\t\"time\"\n)\n\ntype TestTable struct {\nColumnName *time.Time `db:\"column_name\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n\t\"time\"\n)\n\ntype TestTable struct {\nColumnName *time.Time `db:\"column_name\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -1172,9 +1123,9 @@ func TestRun_TemporalColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name_1",
@@ -1204,10 +1155,10 @@ func TestRun_TemporalColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\nimport (\n\t\"time\"\n\t\n"+db.GetDriverImportLibrary()+"\n)\n\ntype TestTable struct {\nColumnName1 "+dbType.String()+".NullTime `db:\"column_name_1\"`\nColumnName2 time.Time `db:\"column_name_2\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n\t\"time\"\n\t\n"+db.GetDriverImportLibrary()+"\n)\n\ntype TestTable struct {\nColumnName1 "+dbType.String()+".NullTime `db:\"column_name_1\"`\nColumnName2 time.Time `db:\"column_name_2\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -1218,9 +1169,9 @@ func TestRun_TemporalColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name_1",
@@ -1250,10 +1201,10 @@ func TestRun_TemporalColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\nimport (\n\t\"time\"\n)\n\ntype TestTable struct {\nColumnName1 *time.Time `db:\"column_name_1\"`\nColumnName2 time.Time `db:\"column_name_2\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n\t\"time\"\n)\n\ntype TestTable struct {\nColumnName1 *time.Time `db:\"column_name_1\"`\nColumnName2 time.Time `db:\"column_name_2\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -1263,9 +1214,9 @@ func TestRun_TemporalColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table1 := &database.Table{
+						table1 := &object_model.Table{
 							Name: "test_table_1",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name_1",
@@ -1279,9 +1230,9 @@ func TestRun_TemporalColumns(t *testing.T) {
 								},
 							},
 						}
-						table2 := &database.Table{
+						table2 := &object_model.Table{
 							Name: "test_table_2",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name_1",
@@ -1312,15 +1263,15 @@ func TestRun_TemporalColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable1",
-								"package dto\n\nimport (\n\t\"time\"\n\t\n"+db.GetDriverImportLibrary()+"\n)\n\ntype TestTable1 struct {\nColumnName1 "+dbType.String()+".NullTime `db:\"column_name_1\"`\nColumnName2 time.Time `db:\"column_name_2\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n\t\"time\"\n\t\n"+db.GetDriverImportLibrary()+"\n)\n\ntype TestTable1 struct {\nColumnName1 "+dbType.String()+".NullTime `db:\"column_name_1\"`\nColumnName2 time.Time `db:\"column_name_2\"`\n}",
 							).
 							On(
 								"Write",
 								"TestTable2",
-								"package dto\n\nimport (\n\t\"time\"\n\t\n"+db.GetDriverImportLibrary()+"\n)\n\ntype TestTable2 struct {\nColumnName1 time.Time `db:\"column_name_1\"`\nColumnName2 "+dbType.String()+".NullTime `db:\"column_name_2\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n\t\"time\"\n\t\n"+db.GetDriverImportLibrary()+"\n)\n\ntype TestTable2 struct {\nColumnName1 time.Time `db:\"column_name_1\"`\nColumnName2 "+dbType.String()+".NullTime `db:\"column_name_2\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 				})
@@ -1348,9 +1299,9 @@ func TestRun_BooleanColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name",
@@ -1374,10 +1325,10 @@ func TestRun_BooleanColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\ntype TestTable struct {\nColumnName bool `db:\"column_name\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\ntype TestTable struct {\nColumnName bool `db:\"column_name\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -1387,9 +1338,9 @@ func TestRun_BooleanColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name",
@@ -1414,10 +1365,10 @@ func TestRun_BooleanColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable struct {\nColumnName sql.NullBool `db:\"column_name\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable struct {\nColumnName sql.NullBool `db:\"column_name\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -1428,9 +1379,9 @@ func TestRun_BooleanColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name",
@@ -1455,10 +1406,10 @@ func TestRun_BooleanColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\nimport (\n)\n\ntype TestTable struct {\nColumnName *bool `db:\"column_name\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n)\n\ntype TestTable struct {\nColumnName *bool `db:\"column_name\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -1468,9 +1419,9 @@ func TestRun_BooleanColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name_1",
@@ -1500,10 +1451,10 @@ func TestRun_BooleanColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable struct {\nColumnName1 sql.NullBool `db:\"column_name_1\"`\nColumnName2 bool `db:\"column_name_2\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable struct {\nColumnName1 sql.NullBool `db:\"column_name_1\"`\nColumnName2 bool `db:\"column_name_2\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -1514,9 +1465,9 @@ func TestRun_BooleanColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table := &database.Table{
+						table := &object_model.Table{
 							Name: "test_table",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name_1",
@@ -1546,10 +1497,10 @@ func TestRun_BooleanColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable",
-								"package dto\n\nimport (\n)\n\ntype TestTable struct {\nColumnName1 *bool `db:\"column_name_1\"`\nColumnName2 bool `db:\"column_name_2\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n)\n\ntype TestTable struct {\nColumnName1 *bool `db:\"column_name_1\"`\nColumnName2 bool `db:\"column_name_2\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 
@@ -1559,9 +1510,9 @@ func TestRun_BooleanColumns(t *testing.T) {
 
 						mdb := newMockDb(db)
 
-						table1 := &database.Table{
+						table1 := &object_model.Table{
 							Name: "test_table_1",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name_1",
@@ -1575,9 +1526,9 @@ func TestRun_BooleanColumns(t *testing.T) {
 								},
 							},
 						}
-						table2 := &database.Table{
+						table2 := &object_model.Table{
 							Name: "test_table_2",
-							Columns: []database.Column{
+							Columns: []object_model.Column{
 								{
 									OrdinalPosition: 1,
 									Name:            "column_name_1",
@@ -1608,15 +1559,15 @@ func TestRun_BooleanColumns(t *testing.T) {
 							On(
 								"Write",
 								"TestTable1",
-								"package dto\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable1 struct {\nColumnName1 sql.NullBool `db:\"column_name_1\"`\nColumnName2 bool `db:\"column_name_2\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable1 struct {\nColumnName1 sql.NullBool `db:\"column_name_1\"`\nColumnName2 bool `db:\"column_name_2\"`\n}",
 							).
 							On(
 								"Write",
 								"TestTable2",
-								"package dto\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable2 struct {\nColumnName1 bool `db:\"column_name_1\"`\nColumnName2 sql.NullBool `db:\"column_name_2\"`\n}",
+								"package "+object_model.DefaultPacakgeName+"\n\nimport (\n\t\"database/sql\"\n)\n\ntype TestTable2 struct {\nColumnName1 bool `db:\"column_name_1\"`\nColumnName2 sql.NullBool `db:\"column_name_2\"`\n}",
 							)
 
-						err := RunDatabaseToGoServices(s.Settings, mdb, w)
+						err := database_to_object_model.RunDatabaseToGoServices(s.Settings, mdb, w)
 						assert.NoError(t, err)
 					})
 				})
@@ -1641,7 +1592,7 @@ func TestValidVariableName(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			if validVariableName(tc.input) != tc.expected {
+			if database_to_object_model.ValidVariableName(tc.input) != tc.expected {
 				t.Errorf("TestValidVariableName(%q) should be %t", tc.input, tc.expected)
 			}
 		})
@@ -1667,7 +1618,7 @@ func TestReplaceSpace(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			output := replaceSpace(tc.input)
+			output := database_to_object_model.ReplaceSpace(tc.input)
 			if output != tc.expected {
 				t.Errorf("replaceSpace(%q) = %q, expected %q", tc.input, output, tc.expected)
 			}
@@ -1686,11 +1637,11 @@ func TestFormatColumnName(t *testing.T) {
 			camel    string
 		}
 		tests := []testCase{
-			{"startWithNumber", "1fish2fish", "X_1fish2fish", "X1fish2fish"},
+			{"startWithNumber", "1fish2fish", "X_1Fish2fish", "X1Fish2fish"},
 			{"containsSpaces", "my column\twith\nmany\u200bspaces", "My_column_with_many_spaces", "MyColumnWithManySpaces"},
-			{"titleCase", "MyColumn", "MyColumn", "MyColumn"},
+			{"titleCase", "MyColumn", "Mycolumn", "Mycolumn"},
 			{"snakeCase", "my_column", "My_column", "MyColumn"},
-			{"titleSnake", "My_Column", "My_Column", "MyColumn"},
+			{"titleSnake", "My_Column", "My_column", "MyColumn"},
 			{"numbersOnly", "123", "X_123", "X123"},
 			{"nonEnglish", "火", "火", "火"},
 			{"nonEnglishUpper", "Λλ", "Λλ", "Λλ"},
@@ -1703,7 +1654,7 @@ func TestFormatColumnName(t *testing.T) {
 		t.Run("camelcase", func(t *testing.T) {
 			for _, tc := range tests {
 				t.Run(tc.name, func(t *testing.T) {
-					output, err := formatColumnName(camelSettings.Settings, tc.input, "MyTable")
+					output, err := database_to_object_model.FormatColumnName(camelSettings.Settings, tc.input, "MyTable")
 					if err != nil {
 						t.Error(err)
 					} else if output != tc.camel {
@@ -1715,7 +1666,7 @@ func TestFormatColumnName(t *testing.T) {
 		t.Run("original", func(t *testing.T) {
 			for _, tc := range tests {
 				t.Run(tc.name, func(t *testing.T) {
-					output, err := formatColumnName(originalSettings.Settings, tc.input, "MyTable")
+					output, err := database_to_object_model.FormatColumnName(originalSettings.Settings, tc.input, "MyTable")
 					if err != nil {
 						t.Error(err)
 					} else if output != tc.original {
@@ -1737,7 +1688,7 @@ func TestFormatColumnName(t *testing.T) {
 		settings := configurations.CreateNewSettings()
 		for _, tc := range tests {
 			t.Run(tc.name, func(t *testing.T) {
-				_, err := formatColumnName(settings.Settings, tc.input, "MyTable")
+				_, err := database_to_object_model.FormatColumnName(settings.Settings, tc.input, "MyTable")
 				if err == nil {
 					t.Errorf("formatColumnName(%q) should have thrown error but didn't", tc.input)
 				}

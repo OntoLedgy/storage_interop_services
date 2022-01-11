@@ -2,17 +2,17 @@ package database_to_object_model
 
 import (
 	"fmt"
+	"github.com/OntoLedgy/storage_interop_services/code/object_model"
 	"github.com/OntoLedgy/storage_interop_services/code/object_model/configurations"
+	"github.com/OntoLedgy/storage_interop_services/code/services/databases/contract"
+	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/output/writer"
+	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/tagger"
 	"github.com/iancoleman/strcase"
 	"golang.org/x/text/language"
 
 	"golang.org/x/text/cases"
 	"strings"
 	"unicode"
-
-	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/pkg/database"
-	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/pkg/output"
-	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/pkg/tagger"
 )
 
 var (
@@ -26,8 +26,8 @@ var (
 // RunDatabaseToGoServices runs the transformations by creating the concrete Database by the provided settings
 func RunDatabaseToGoServices(
 	settings *configurations.Settings,
-	sourceDatabase database.Database,
-	out output.Writer) (
+	sourceDatabase contract.Database,
+	out writer.Writer) (
 	err error) {
 
 	taggers =
@@ -63,9 +63,9 @@ func RunDatabaseToGoServices(
 
 func RunTableToGoServices(
 	settings *configurations.Settings,
-	sourceDatabase database.Database,
-	out output.Writer,
-	sourceDatabaseTables []*database.Table) error {
+	sourceDatabase contract.Database,
+	out writer.Writer,
+	sourceDatabaseTables []*object_model.Table) error {
 
 	if err := sourceDatabase.PrepareGetColumnsOfTableStmt(); err != nil {
 		return fmt.Errorf("could not prepare the get-column-statement: %v", err)
@@ -103,9 +103,8 @@ func RunTableToGoServices(
 			continue
 		}
 
-		fileName :=
-			CamelCaseString(
-				tableName)
+		fileName := tableName
+		//CamelCaseString(
 
 		if settings.IsFileNameFormatSnakeCase() {
 			fileName = strcase.ToSnake(fileName)
@@ -127,35 +126,37 @@ func RunTableToGoServices(
 
 func createTableStructString(
 	settings *configurations.Settings,
-	sourceDatabase database.Database,
-	sourceDatabaseTable *database.Table) (
+	sourceDatabase contract.Database,
+	sourceDatabaseTable *object_model.Table) (
 	string,
 	string,
 	error) {
 
 	var structFields strings.Builder
-	tableName := strings.Title(
+	titleCaser := cases.Title(language.English)
+
+	tableName := titleCaser.String(
 		settings.Prefix +
 			sourceDatabaseTable.Name +
 			settings.Suffix)
 
 	// Replace any whitespace with underscores
-	tableName = strings.Map(replaceSpace, tableName)
+	tableName = strings.Map(ReplaceSpace, tableName)
 	if settings.IsOutputFormatCamelCase() {
 		tableName = CamelCaseString(tableName)
 	}
 
 	// Check that the sourceDatabaseTable name doesn't contain any invalid characters for Go variables
-	if !validVariableName(tableName) {
+	if !ValidVariableName(tableName) {
 		return "", "", fmt.Errorf("sourceDatabaseTable name %q contains invalid characters", sourceDatabaseTable.Name)
 	}
 
-	columnInfo := configurations.ColumnInfo{}
+	columnInfo := object_model.Columns{}
 	columns := map[string]struct{}{}
 
 	for _, column := range sourceDatabaseTable.Columns {
 
-		columnName, err := formatColumnName(
+		columnName, err := FormatColumnName(
 			settings,
 			column.Name,
 			sourceDatabaseTable.Name)
@@ -226,8 +227,8 @@ func createTableStructString(
 func generateImports(
 	content *strings.Builder,
 	settings *configurations.Settings,
-	db database.Database,
-	columnInfo configurations.ColumnInfo) {
+	db contract.Database,
+	columnInfo object_model.Columns) {
 
 	if !columnInfo.HasTrue() && !settings.IsMastermindStructableRecorder {
 		return
@@ -258,10 +259,10 @@ func generateImports(
 
 func mapDbColumnTypeToGoType(
 	s *configurations.Settings,
-	db database.Database,
-	column database.Column) (
+	db contract.Database,
+	column object_model.Column) (
 	goType string,
-	columnInfo configurations.ColumnInfo) {
+	columnInfo object_model.Columns) {
 	if db.IsString(column) || db.IsText(column) {
 		goType = "string"
 		if db.IsNullable(column) {
@@ -323,14 +324,15 @@ func CamelCaseString(
 	splitted := strings.Split(s, "_")
 
 	if len(splitted) == 1 {
-		caseTitle.String(s)
-		return caseTitle.String(s)
-		//return strings.ToTitle(s)
+		titleCaseString := caseTitle.String(s)
+
+		return titleCaseString
+
 	}
 
 	var cc string
 	for _, part := range splitted {
-		cc += caseTitle.String((strings.ToLower(part)))
+		cc += caseTitle.String(strings.ToLower(part))
 	}
 	return cc
 }
@@ -345,7 +347,7 @@ func getNullType(
 	return primitive
 }
 
-func toInitialisms(
+func ToInitialisms(
 	s string) string {
 	for _, substr := range initialisms {
 		idx := indexCaseInsensitive(s, substr)
@@ -366,7 +368,7 @@ func indexCaseInsensitive(
 
 // ValidVariableName checks for the existence of any characters
 // outside of Unicode letters, numbers and underscore.
-func validVariableName(
+func ValidVariableName(
 	s string) bool {
 	for _, r := range s {
 		if !(unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_') {
@@ -378,7 +380,7 @@ func validVariableName(
 
 // ReplaceSpace swaps any Unicode space characters for underscores
 // to create valid Go identifiers
-func replaceSpace(
+func ReplaceSpace(
 	r rune) rune {
 	if unicode.IsSpace(r) || r == '\u200B' {
 		return '_'
@@ -388,7 +390,7 @@ func replaceSpace(
 
 // FormatColumnName checks for invalid characters and transforms a column name
 // according to the provided settings.
-func formatColumnName(
+func FormatColumnName(
 	settings *configurations.Settings,
 	column,
 	table string) (
@@ -396,18 +398,20 @@ func formatColumnName(
 	error) {
 
 	// Replace any whitespace with underscores
-	columnName := strings.Map(replaceSpace, column)
-	columnName = strings.Title(columnName)
+	columnName := strings.Map(ReplaceSpace, column)
+	columnNameTitleCaser := cases.Title(language.English)
+
+	columnName = columnNameTitleCaser.String(columnName)
 
 	if settings.IsOutputFormatCamelCase() {
 		columnName = CamelCaseString(columnName)
 	}
 	if settings.ShouldInitialism() {
-		columnName = toInitialisms(columnName)
+		columnName = ToInitialisms(columnName)
 	}
 
 	// Check that the column name doesn't contain any invalid characters for Go variables
-	if !validVariableName(columnName) {
+	if !ValidVariableName(columnName) {
 		return "", fmt.Errorf("column name %q in table %q contains invalid characters", column, table)
 	}
 	// First character of an identifier in Go must be letter or _

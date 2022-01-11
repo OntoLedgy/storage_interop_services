@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"github.com/OntoLedgy/storage_interop_services/code/object_model"
 	"github.com/OntoLedgy/storage_interop_services/code/object_model/configurations"
 	"strings"
 
@@ -11,7 +12,7 @@ import (
 
 // Postgresql implemenmts the Database interface with help of generalDatabase
 type Postgresql struct {
-	*GeneralDatabase
+	*GeneralDatabases
 
 	defaultUserName string
 }
@@ -19,7 +20,7 @@ type Postgresql struct {
 // NewPostgresql creates a new Postgresql database
 func NewPostgresql(s *configurations.Settings) *Postgresql {
 	return &Postgresql{
-		GeneralDatabase: &GeneralDatabase{
+		GeneralDatabases: &GeneralDatabases{
 			Settings: s,
 			driver:   dbTypeToDriverMap[s.DbType],
 		},
@@ -29,7 +30,7 @@ func NewPostgresql(s *configurations.Settings) *Postgresql {
 
 // Connect connects to the database by the given data source name (dsn) of the concrete database
 func (pg *Postgresql) Connect() error {
-	return pg.GeneralDatabase.Connect(pg.DSN())
+	return pg.GeneralDatabases.Connect(pg.DSN())
 }
 
 // DSN creates the DSN String to connect to this database
@@ -48,7 +49,7 @@ func (pg *Postgresql) GetDriverImportLibrary() string {
 }
 
 // GetTables gets all tables for a given schema by name
-func (pg *Postgresql) GetTables() (tables []*Table, err error) {
+func (pg *Postgresql) GetTables() (tables []*object_model.Table, err error) {
 
 	err = pg.Select(&tables, `
 		SELECT table_name
@@ -98,7 +99,7 @@ func (pg *Postgresql) PrepareGetColumnsOfTableStmt() (err error) {
 }
 
 // GetColumnsOfTable executes the statement for retrieving the columns of a specific table in a given schema
-func (pg *Postgresql) GetColumnsOfTable(table *Table) (err error) {
+func (pg *Postgresql) GetColumnsOfTable(table *object_model.Table) (err error) {
 
 	err = pg.GetColumnsOfTableStmt.Select(&table.Columns, table.Name, pg.Schema)
 
@@ -113,12 +114,12 @@ func (pg *Postgresql) GetColumnsOfTable(table *Table) (err error) {
 }
 
 // IsPrimaryKey checks if column belongs to primary key
-func (pg *Postgresql) IsPrimaryKey(column Column) bool {
+func (pg *Postgresql) IsPrimaryKey(column object_model.Column) bool {
 	return strings.Contains(column.ConstraintType.String, "PRIMARY KEY")
 }
 
 // IsAutoIncrement checks if column is a serial column
-func (pg *Postgresql) IsAutoIncrement(column Column) bool {
+func (pg *Postgresql) IsAutoIncrement(column object_model.Column) bool {
 	return strings.Contains(column.DefaultValue.String, "nextval")
 }
 
@@ -133,7 +134,7 @@ func (pg *Postgresql) GetStringDatatypes() []string {
 }
 
 // IsString returns true if colum is of type string for the postgre database
-func (pg *Postgresql) IsString(column Column) bool {
+func (pg *Postgresql) IsString(column object_model.Column) bool {
 	return pg.IsStringInSlice(column.DataType, pg.GetStringDatatypes())
 }
 
@@ -145,7 +146,7 @@ func (pg *Postgresql) GetTextDatatypes() []string {
 }
 
 // IsText returns true if colum is of type text for the postgre database
-func (pg *Postgresql) IsText(column Column) bool {
+func (pg *Postgresql) IsText(column object_model.Column) bool {
 	return pg.IsStringInSlice(column.DataType, pg.GetTextDatatypes())
 }
 
@@ -162,7 +163,7 @@ func (pg *Postgresql) GetIntegerDatatypes() []string {
 }
 
 // IsInteger returns true if colum is of type integer for the postgre database
-func (pg *Postgresql) IsInteger(column Column) bool {
+func (pg *Postgresql) IsInteger(column object_model.Column) bool {
 	return pg.IsStringInSlice(column.DataType, pg.GetIntegerDatatypes())
 }
 
@@ -177,7 +178,7 @@ func (pg *Postgresql) GetFloatDatatypes() []string {
 }
 
 // IsFloat returns true if colum is of type float for the postgre database
-func (pg *Postgresql) IsFloat(column Column) bool {
+func (pg *Postgresql) IsFloat(column object_model.Column) bool {
 	return pg.IsStringInSlice(column.DataType, pg.GetFloatDatatypes())
 }
 
@@ -195,7 +196,7 @@ func (pg *Postgresql) GetTemporalDatatypes() []string {
 }
 
 // IsTemporal returns true if colum is of type temporal for the postgre database
-func (pg *Postgresql) IsTemporal(column Column) bool {
+func (pg *Postgresql) IsTemporal(column object_model.Column) bool {
 	return pg.IsStringInSlice(column.DataType, pg.GetTemporalDatatypes())
 }
 

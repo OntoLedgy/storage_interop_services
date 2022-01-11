@@ -1,6 +1,7 @@
-package output
+package decorator
 
 import (
+	"github.com/OntoLedgy/storage_interop_services/code/object_model"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,8 +16,8 @@ func TestFormatDecorator_Decorate(t *testing.T) {
 	}{
 		{
 			desc:  "well formed golang code should get decorated",
-			input: "package dto\ntype Bar struct {\nID int `db:\"id\"`\n}",
-			expected: `package dto
+			input: "package " + object_model.DefaultPacakgeName + "\ntype Bar struct {\nID int `db:\"id\"`\n}",
+			expected: `package "+object_model.DefaultPacakgeName+"
 
 type Bar struct {
 	ID int ` + "`db:\"id\"" + "`" + `
@@ -42,6 +43,7 @@ type Bar struct {
 			assert.Equal(t, test.expected, actual)
 		})
 	}
+
 }
 
 func TestImportDecorator_Decorate(t *testing.T) {
@@ -53,14 +55,14 @@ func TestImportDecorator_Decorate(t *testing.T) {
 	}{
 		{
 			desc:     "well formed golang code with inport-statement should get decorated",
-			input:    "package dto\n\nimport ()\n\ntype Bar struct {\nID int `db:\"id\"`\n}",
-			expected: "package dto\n\ntype Bar struct {\nID int `db:\"id\"`\n}",
+			input:    "package " + object_model.DefaultPacakgeName + "\n\nimport ()\n\ntype Bar struct {\nID int `db:\"id\"`\n}",
+			expected: "package " + object_model.DefaultPacakgeName + "\n\ntype Bar struct {\nID int `db:\"id\"`\n}",
 			isError:  assert.NoError,
 		},
 		{
 			desc:     "well formed golang code without inport-statement should stay unchanged",
-			input:    "package dto\n\ntype Bar struct {\nID int `db:\"id\"`\n}",
-			expected: "package dto\n\ntype Bar struct {\nID int `db:\"id\"`\n}",
+			input:    "package " + object_model.DefaultPacakgeName + "\n\ntype Bar struct {\nID int `db:\"id\"`\n}",
+			expected: "package " + object_model.DefaultPacakgeName + "\n\ntype Bar struct {\nID int `db:\"id\"`\n}",
 			isError:  assert.NoError,
 		},
 	}

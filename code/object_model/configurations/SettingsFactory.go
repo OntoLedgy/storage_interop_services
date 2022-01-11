@@ -1,6 +1,7 @@
 package configurations
 
 import (
+	"github.com/OntoLedgy/storage_interop_services/code/object_model"
 	"path/filepath"
 )
 
@@ -56,7 +57,7 @@ func (settingsFactory *SettingsFactory) Create() *Settings {
 
 	if packageNameIsNull {
 
-		packageName = "default_package"
+		packageName = object_model.DefaultPacakgeName
 	}
 
 	settings := &Settings{

@@ -1,8 +1,9 @@
-package database
+package testing
 
 import (
 	"fmt"
 	"github.com/OntoLedgy/storage_interop_services/code/object_model/configurations"
+	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/database"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -17,7 +18,7 @@ func TestPostgresql_DSN(t *testing.T) {
 		{
 			desc: "no username given, defaults to `postgres`",
 			settings: func() *configurations.Settings {
-				s := CreateNewSettings()
+				s := configurations.CreateNewSettings()
 				s.DbType = configurations.DbTypePostgresql
 				return s.Settings
 			},
@@ -29,7 +30,7 @@ func TestPostgresql_DSN(t *testing.T) {
 		{
 			desc: "with given username, default gets overwritten",
 			settings: func() *configurations.Settings {
-				s := CreateNewSettings()
+				s := configurations.CreateNewSettings()
 				s.DbType = configurations.DbTypePostgresql
 				s.User = "my_custom_user"
 				return s.Settings
@@ -42,7 +43,7 @@ func TestPostgresql_DSN(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.desc, func(t *testing.T) {
-			db := NewPostgresql(test.settings())
+			db := database.NewPostgresql(test.settings())
 			actual := db.DSN()
 			assert.Equal(t, test.expected(db.Settings), actual)
 		})

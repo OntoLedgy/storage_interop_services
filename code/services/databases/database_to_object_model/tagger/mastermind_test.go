@@ -2,19 +2,19 @@ package tagger
 
 import (
 	"database/sql"
+	"github.com/OntoLedgy/storage_interop_services/code/object_model"
 	"github.com/OntoLedgy/storage_interop_services/code/object_model/configurations"
+	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/database"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/OntoLedgy/storage_interop_services/code/services/databases/database_to_object_model/pkg/database"
 )
 
 func TestMastermind_GenerateTag(t *testing.T) {
 	type test struct {
 		desc     string
 		settings func() *configurations.DatabaseToGoSettings
-		column   database.Column
+		column   object_model.Column
 		expected string
 	}
 
@@ -29,7 +29,7 @@ func TestMastermind_GenerateTag(t *testing.T) {
 					s.TagsMastermindStructable = true
 					return s
 				},
-				column: database.Column{
+				column: object_model.Column{
 					Name: "column_name",
 				},
 				expected: `stbl:"column_name"`,
@@ -43,7 +43,7 @@ func TestMastermind_GenerateTag(t *testing.T) {
 					s.TagsMastermindStructable = true
 					return s
 				},
-				column: database.Column{
+				column: object_model.Column{
 					Name: "column_name",
 					ConstraintType: sql.NullString{
 						String: "PRIMARY KEY",
@@ -61,7 +61,7 @@ func TestMastermind_GenerateTag(t *testing.T) {
 					s.TagsMastermindStructable = true
 					return s
 				},
-				column: database.Column{
+				column: object_model.Column{
 					Name: "column_name",
 					ConstraintType: sql.NullString{
 						String: "PRIMARY KEY",
@@ -85,7 +85,7 @@ func TestMastermind_GenerateTag(t *testing.T) {
 					s.TagsMastermindStructable = true
 					return s
 				},
-				column: database.Column{
+				column: object_model.Column{
 					Name: "column_name",
 				},
 				expected: `stbl:"column_name"`,
@@ -99,7 +99,7 @@ func TestMastermind_GenerateTag(t *testing.T) {
 					s.TagsMastermindStructable = true
 					return s
 				},
-				column: database.Column{
+				column: object_model.Column{
 					Name:      "column_name",
 					ColumnKey: "PRI",
 				},
@@ -114,7 +114,7 @@ func TestMastermind_GenerateTag(t *testing.T) {
 					s.TagsMastermindStructable = true
 					return s
 				},
-				column: database.Column{
+				column: object_model.Column{
 					Name:      "column_name",
 					ColumnKey: "PRI",
 					Extra:     "auto_increment",
@@ -132,7 +132,7 @@ func TestMastermind_GenerateTag(t *testing.T) {
 					s.TagsMastermindStructable = true
 					return s
 				},
-				column: database.Column{
+				column: object_model.Column{
 					Name: "column_name",
 				},
 				expected: `stbl:"column_name"`,
@@ -146,7 +146,7 @@ func TestMastermind_GenerateTag(t *testing.T) {
 					s.TagsMastermindStructable = true
 					return s
 				},
-				column: database.Column{
+				column: object_model.Column{
 					Name:      "column_name",
 					ColumnKey: "PK",
 				},
