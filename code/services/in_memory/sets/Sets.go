@@ -1,8 +1,5 @@
 package sets
 
-//TODO move this out to common services
-
-// Declaring new data type
 type Sets[T comparable] map[T]bool
 
 // T is the generic type it can be any comparable data type
