@@ -2,7 +2,7 @@ package testing
 
 import (
 	"fmt"
-	files "github.com/OntoLedgy/storage_interop_services/code/services/disk/files"
+	files "github.com/OntoLedgy/storage_interop_services/code/services/disk/file_system_service"
 	"testing"
 )
 

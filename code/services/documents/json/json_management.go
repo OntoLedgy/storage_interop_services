@@ -6,7 +6,8 @@ import (
 	"os"
 )
 
-func Read_json_to_byte_array(json_file_name string) []byte {
+func Read_json_to_byte_array(
+	json_file_name string) []byte {
 
 	json_data, json_file_read_error :=
 		os.Open(

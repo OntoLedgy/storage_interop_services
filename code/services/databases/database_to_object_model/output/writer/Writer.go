@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	// FileWriterExtension is the extension to write files of.
+	// FileWriterExtension is the extension to write file_system_service of.
 	FileWriterExtension = ".go"
 )
 
