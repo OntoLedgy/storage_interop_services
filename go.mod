@@ -4,29 +4,34 @@ go 1.18
 
 require (
 	github.com/OntoLedgy/domain_ontologies v0.0.6
-	github.com/OntoLedgy/logging_services v0.0.5
+	github.com/OntoLedgy/logging_services v0.0.7
+	github.com/OntoLedgy/ol_common_services v0.0.3
 	github.com/TomOnTime/utfutil v0.0.0-20210710122150-437f72b26edf
 	github.com/apex/log v1.9.0
-	github.com/go-sql-driver/mysql v1.5.0
-	github.com/iancoleman/strcase v0.0.0-20191112232945-16388991a334
+	github.com/chigopher/pathlib v0.12.0
+	github.com/go-sql-driver/mysql v1.6.0
+	github.com/iancoleman/strcase v0.2.0
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/lib/pq v1.10.4
 	github.com/mattn/go-adodb v0.0.1
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca
-	github.com/satori/go.uuid v1.2.0
+	github.com/spf13/afero v1.8.1
+	github.com/sqweek/dialog v0.0.0-20211002065838-9a201b55ab91
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/text v0.3.7
 )
 
 require (
+	github.com/TheTitanrain/w32 v0.0.0-20200114052255-2654d97dbd3d // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
-	github.com/pkg/errors v0.8.1 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/stretchr/objx v0.1.0 // indirect
-	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f // indirect
-	golang.org/x/sys v0.0.0-20210423082822-04245dca01da // indirect
+	github.com/satori/go.uuid v1.2.0 // indirect
+	github.com/stretchr/objx v0.3.0 // indirect
+	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
+	golang.org/x/sys v0.0.0-20220223155357-96fed51e1446 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
-	gopkg.in/yaml.v3 v3.0.0-20200605160147-a5ece683394c // indirect
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )

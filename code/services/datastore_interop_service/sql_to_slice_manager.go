@@ -1,4 +1,4 @@
-package utils
+package datastore_interop_service
 
 import (
 	"database/sql"

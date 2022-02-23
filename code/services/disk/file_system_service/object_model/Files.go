@@ -1,16 +1,24 @@
 package object_model
 
 type Files struct {
-	*FileSystemObjects
+	FileSystemObjects
 	parentFolder *Folders
 }
 
-func (file *Files) initialise(absolutePathString string, parentFolder *Folders) {
-	file.FileSystemObjects.initialise(absolutePathString)
-	file.addToParent(parentFolder)
+func (file *Files) Initialise(
+	absolutePathString string,
+	additionalParentFolder ...*Folders) {
+
+	file.FileSystemObjects.Initialise(absolutePathString)
+
+	if len(additionalParentFolder) > 0 {
+		file.addToParent(additionalParentFolder[0])
+	}
+
 }
 
 func (file *Files) addToParent(parentFolder *Folders) {
+
 	if parentFolder == nil {
 		return
 	}
@@ -19,4 +27,8 @@ func (file *Files) addToParent(parentFolder *Folders) {
 
 	parentFolder.addToChildFiles(file)
 
+}
+
+func (file *Files) ParentFolder() *Folders {
+	return file.parentFolder
 }

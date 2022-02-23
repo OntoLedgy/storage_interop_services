@@ -18,3 +18,11 @@ func TestFileCreateReadDelete(t *testing.T) {
 	files.Delete_file_it_already_exists(fileNameAndPath)
 
 }
+
+func TestFileSelect(t *testing.T) {
+
+	file := files.SelectFile()
+
+	fmt.Println(file.BaseName())
+
+}

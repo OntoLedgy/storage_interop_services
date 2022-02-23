@@ -2,6 +2,7 @@ package testing
 
 import (
 	"fmt"
+	"github.com/OntoLedgy/storage_interop_services/code/services/disk/file_system_service"
 	"github.com/OntoLedgy/storage_interop_services/code/services/documents/csv"
 	"testing"
 )
@@ -9,9 +10,9 @@ import (
 func TestCsvIO(t *testing.T) {
 
 	fileNameAndPath :=
-		"D:\\S\\go\\src\\github.com\\OntoLedgy\\storage_interop_services\\testing\\data\\addresses.csv"
+		file_system_service.CreateFile()
 
-	csv_file, csv_file_data := csv.Open_csv_file(fileNameAndPath)
+	csv_file, csv_file_data := csv.Open_csv_file(fileNameAndPath.AbsolutePathString())
 
 	csv_dataset :=
 		csv.Read_csv_to_slice(

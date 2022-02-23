@@ -1,25 +1,26 @@
 package wrappers
 
 type AbsolutePathWrappers struct {
-	*PathWrappers
+	PathWrappers
 }
 
-func (a *AbsolutePathWrappers) initialise(absolutePathString string) {
+func (a *AbsolutePathWrappers) initialise(
+	absolutePathString string) {
 
-	a.PathWrappers.initialise(absolutePathString)
+	a.PathWrappers.Initialise(absolutePathString)
 
 }
 
 func (a *AbsolutePathWrappers) AbsolutePathString() string {
 
-	absolutePathString := a.PathWrappers.PathString
+	absolutePathString := a.PathString()
 
 	return absolutePathString
 }
 
 func (a *AbsolutePathWrappers) AbsoluteLevel() int {
 
-	absoluteLevel := a.PathWrappers.level
+	absoluteLevel := a.Level()
 
 	return absoluteLevel
 }
