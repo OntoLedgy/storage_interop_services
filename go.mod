@@ -19,19 +19,22 @@ require (
 	github.com/spf13/afero v1.8.1
 	github.com/sqweek/dialog v0.0.0-20211002065838-9a201b55ab91
 	github.com/stretchr/testify v1.7.0
+	github.com/tobgu/qframe v0.3.6
 	golang.org/x/text v0.3.7
 )
 
 require (
 	github.com/TheTitanrain/w32 v0.0.0-20200114052255-2654d97dbd3d // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/go-gota/gota v0.12.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
+	github.com/kr/pretty v0.2.1 // indirect
+	github.com/mauricelam/genny v0.0.0-20190320071652-0800202903e5 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/stretchr/objx v0.3.0 // indirect
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
-	golang.org/x/sys v0.0.0-20220223155357-96fed51e1446 // indirect
-	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
+	golang.org/x/sys v0.0.0-20220224120231-95c6836cb0e7 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )

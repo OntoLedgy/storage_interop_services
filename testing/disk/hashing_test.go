@@ -1,4 +1,4 @@
-package testing
+package disk
 
 import (
 	"github.com/OntoLedgy/storage_interop_services/code/services/disk/file_system_service"

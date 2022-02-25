@@ -1,4 +1,4 @@
-package testing
+package document
 
 import (
 	"github.com/OntoLedgy/storage_interop_services/code/services/documents/json"

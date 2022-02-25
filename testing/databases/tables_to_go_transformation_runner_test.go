@@ -1,4 +1,4 @@
-package testing
+package databases
 
 import (
 	"github.com/OntoLedgy/storage_interop_services/code/object_model"

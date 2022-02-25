@@ -1,4 +1,4 @@
-package testing
+package databases
 
 import (
 	"testing"
