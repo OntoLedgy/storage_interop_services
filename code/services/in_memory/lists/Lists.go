@@ -3,30 +3,51 @@ package lists
 import "container/list"
 
 type Lists struct {
-	list.List
+	*list.List
 }
 
-func (list *Lists) AddStringSlice(sliceItems []string) {
+func (thisList *Lists) Iterate() (f func() (*list.Element, bool), hasNext bool) {
+	lengthOfList := thisList.Len()
+
+	loopIndex := lengthOfList
+
+	hasNext = lengthOfList > 0
+	element := thisList.Front()
+
+	f = func() (*list.Element, bool) {
+		if loopIndex == lengthOfList {
+			loopIndex--
+			return thisList.Front(), loopIndex > 0
+		} else {
+			loopIndex--
+			element = element.Next()
+			return element, loopIndex > 0
+		}
+	}
+	return
+}
+
+func (thisList *Lists) AddStringSlice(sliceItems []string) {
 
 	for _, sliceItem := range sliceItems {
-		list.PushBack(sliceItem)
+		thisList.PushBack(sliceItem)
 	}
 
 }
 
-func (list *Lists) RemoveElementString(elementName string) {
+func (thisList *Lists) RemoveElementString(elementName string) {
 
-	for element := list.Front(); element != nil; element = element.Next() {
+	for element := thisList.Front(); element != nil; element = element.Next() {
 		if element.Value.(string) == elementName {
-			list.Remove(element)
+			thisList.Remove(element)
 		}
 	}
 
 }
 
-func (list *Lists) Contains(elementName string) bool {
+func (thisList *Lists) Contains(elementName string) bool {
 
-	for element := list.Front(); element != nil; element = element.Next() {
+	for element := thisList.Front(); element != nil; element = element.Next() {
 		if element.Value.(string) == elementName {
 			return true
 		}
