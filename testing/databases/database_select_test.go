@@ -4,15 +4,16 @@ import (
 	"fmt"
 	discogs "github.com/OntoLedgy/domain_ontologies/code/data_models/discogs"
 	musicbrainz "github.com/OntoLedgy/domain_ontologies/code/data_models/musicbrainz"
-	"github.com/OntoLedgy/storage_interop_services/code/services/database_transactions"
-	"github.com/OntoLedgy/storage_interop_services/code/services/database_transactions/data_model"
-	"github.com/OntoLedgy/storage_interop_services/code/services/databases"
+	"github.com/OntoLedgy/storage_interop_services/code/services/database_services/database_i_o_service"
+	"github.com/OntoLedgy/storage_interop_services/code/services/database_services/database_i_o_service/object_model/configurations"
+	"github.com/OntoLedgy/storage_interop_services/code/services/database_services/database_transactions_service"
+	data_model2 "github.com/OntoLedgy/storage_interop_services/code/services/database_services/database_transactions_service/object_model"
 	"testing"
 )
 
 func TestQuery(t *testing.T) {
 
-	var queryArtists data_model.Queries = "SELECT * FROM artist WHERE Name = 'Thirdwave'"
+	var queryArtists data_model2.Queries = "SELECT * FROM artist WHERE Name = 'Thirdwave'"
 
 	testMusicBrainz(queryArtists)
 
@@ -20,25 +21,26 @@ func TestQuery(t *testing.T) {
 
 }
 
-func testDiscogs(queryArtists data_model.Queries) {
+func testDiscogs(queryArtists data_model2.Queries) {
 
-	discogs_database_factory := &databases.DatabaseFactory{
+	discogs_database_factory := &database_i_o_service.DatabaseFactory{
 		"192.168.0.45",
 		5432,
 		"ladmin",
 		"Numark234",
 		"discogs",
 		"postgres",
-	}
+		configurations.DbTypePostgresql,
+		""}
 
 	discogsDatabase :=
-		discogs_database_factory.Create()
+		discogs_database_factory.New()
 
-	discogsDatabase.ConnectDatabase()
+	discogsDatabase.Connect()
 
 	discogArtists := &[]discogs.Artist{}
 
-	query := data_model.Queryx{
+	query := data_model2.Queryx{
 		queryArtists,
 		[]interface{}{},
 	}
@@ -46,12 +48,12 @@ func testDiscogs(queryArtists data_model.Queries) {
 	offset := 0
 	count := 2
 
-	var limitOptions = &data_model.LimitOptions{
+	var limitOptions = &data_model2.LimitOptions{
 		offset,
 		count,
 	}
 
-	transactionFactory := &database_transactions.DatabaseTransactionFactory{
+	transactionFactory := &database_transactions_service.DatabaseTransactionFactory{
 		discogsDatabase,
 	}
 
@@ -66,29 +68,30 @@ func testDiscogs(queryArtists data_model.Queries) {
 		"found %v records in discogs\n",
 		len(*discogArtists))
 
-	discogsDatabase.CloseDatabase()
+	discogsDatabase.Close()
 
 }
 
-func testMusicBrainz(queryArtists data_model.Queries) *databases.DatabaseFactory {
+func testMusicBrainz(queryArtists data_model2.Queries) *database_i_o_service.DatabaseFactory {
 	//move to config.json
-	musicbrainz_database_factory := &databases.DatabaseFactory{
+	musicbrainz_database_factory := &database_i_o_service.DatabaseFactory{
 		"192.168.0.45",
 		5432,
 		"musicbrainz",
 		"musicbrainz",
 		"musicbrainz_db",
 		"postgres",
-	}
+		configurations.DbTypePostgresql,
+		""}
 
 	musicbrainzDatabase :=
-		musicbrainz_database_factory.Create()
+		musicbrainz_database_factory.New()
 
-	musicbrainzDatabase.ConnectDatabase()
+	musicbrainzDatabase.Connect()
 
 	musicbrainzArtists := &[]musicbrainz.Artist{}
 
-	query := data_model.Queryx{
+	query := data_model2.Queryx{
 		queryArtists,
 		[]interface{}{},
 	}
@@ -96,12 +99,12 @@ func testMusicBrainz(queryArtists data_model.Queries) *databases.DatabaseFactory
 	offset := 0
 	count := 2
 
-	var limitOptions = &data_model.LimitOptions{
+	var limitOptions = &data_model2.LimitOptions{
 		offset,
 		count,
 	}
 
-	transactionFactory := &database_transactions.DatabaseTransactionFactory{
+	transactionFactory := &database_transactions_service.DatabaseTransactionFactory{
 		musicbrainzDatabase,
 	}
 
@@ -116,6 +119,6 @@ func testMusicBrainz(queryArtists data_model.Queries) *databases.DatabaseFactory
 		"found %v records in musicbrainz \n",
 		len(*musicbrainzArtists))
 
-	musicbrainzDatabase.CloseDatabase()
+	musicbrainzDatabase.Close()
 	return musicbrainz_database_factory
 }

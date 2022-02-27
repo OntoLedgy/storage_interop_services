@@ -1,20 +1,20 @@
 package databases
 
 import (
-	"github.com/OntoLedgy/storage_interop_services/code/object_model"
-	"github.com/OntoLedgy/storage_interop_services/code/services/databases/contract"
+	"github.com/OntoLedgy/storage_interop_services/code/services/database_services/contract"
+	"github.com/OntoLedgy/storage_interop_services/code/services/database_services/database_i_o_service/object_model"
 	"github.com/stretchr/testify/mock"
 )
 
 type mockDb struct {
 	mock.Mock
-	contract.Database
+	contract.IDatabases
 
 	tables []*object_model.Table
 }
 
-func newMockDb(db contract.Database) *mockDb {
-	return &mockDb{Database: db}
+func newMockDb(db contract.IDatabases) *mockDb {
+	return &mockDb{IDatabases: db}
 }
 
 func (db *mockDb) Connect() (err error) {

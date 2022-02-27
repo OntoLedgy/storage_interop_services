@@ -1,7 +1,5 @@
 package slices
 
-import "encoding/json"
-
 func Extract_columns_from_2d_slices(original_slice [][]string, columns_to_extract []int) [][]string {
 
 	length := len(columns_to_extract)
@@ -104,14 +102,3 @@ func Convert_2d_string_to_interface(string_to_convert [][]string) [][]interface{
 
 	return converted_interface
 }
-
-func Pretty_print(json_data [][]interface{}) []byte {
-
-	pretty_printed_json, _ := json.MarshalIndent(
-		json_data,
-		"",
-		"	") //#TODO add pretty_printer to general utilities
-
-	return pretty_printed_json
-
-} //TODO - Stage 1 - move to json utilities
