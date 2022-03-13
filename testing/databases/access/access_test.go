@@ -1,4 +1,4 @@
-package databases
+package access
 
 import (
 	"fmt"
@@ -19,7 +19,7 @@ func TestAccess(t *testing.T) {
 			settings: func() *configurations2.Settings {
 				s := configurations2.CreateNewSettings()
 				s.DbType = configurations2.DbTypeAccess
-				s.DbFileName = "D:\\S\\go\\src\\github.com\\OntoLedgy\\storage_interop_services\\testing\\data\\empty_nf_ea_com.accdb"
+				s.DbFileName = "D:\\S\\go\\src\\github.com\\OntoLedgy\\storage_interop_services\\testing\\data\\empty_ol_ea_com.accdb"
 				return s.Settings
 			},
 			expected: func(s *configurations2.Settings) string {

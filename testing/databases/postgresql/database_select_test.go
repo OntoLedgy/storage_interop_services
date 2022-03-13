@@ -1,4 +1,4 @@
-package databases
+package postgresql
 
 import (
 	"fmt"
@@ -21,7 +21,8 @@ func TestQuery(t *testing.T) {
 
 }
 
-func testDiscogs(queryArtists data_model2.Queries) {
+func testDiscogs(
+	queryArtists data_model2.Queries) {
 
 	discogs_database_factory := &database_i_o_service.DatabaseFactory{
 		"192.168.0.45",
@@ -72,7 +73,9 @@ func testDiscogs(queryArtists data_model2.Queries) {
 
 }
 
-func testMusicBrainz(queryArtists data_model2.Queries) *database_i_o_service.DatabaseFactory {
+func testMusicBrainz(
+	queryArtists data_model2.Queries) {
+
 	//move to config.json
 	musicbrainz_database_factory := &database_i_o_service.DatabaseFactory{
 		"192.168.0.45",
@@ -120,5 +123,5 @@ func testMusicBrainz(queryArtists data_model2.Queries) *database_i_o_service.Dat
 		len(*musicbrainzArtists))
 
 	musicbrainzDatabase.Close()
-	return musicbrainz_database_factory
+
 }

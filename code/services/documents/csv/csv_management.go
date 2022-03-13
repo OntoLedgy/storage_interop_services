@@ -96,7 +96,7 @@ func Write_1d_slice_to_csv(
 
 }
 
-func Read_csv_data(csv_file_name string, delimiter string) [][]string {
+func ReadCsvToSlice(csv_file_name string, delimiter string) [][]string {
 
 	csv_file,
 		csv_file_data :=

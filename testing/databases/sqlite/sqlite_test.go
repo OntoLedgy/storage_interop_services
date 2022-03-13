@@ -1,4 +1,4 @@
-package databases
+package sqlite
 
 import (
 	configurations2 "github.com/OntoLedgy/storage_interop_services/code/services/database_services/database_i_o_service/object_model/configurations"
