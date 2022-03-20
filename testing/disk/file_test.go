@@ -21,8 +21,18 @@ func TestFileCreateReadDelete(t *testing.T) {
 
 func TestFileSelect(t *testing.T) {
 
-	file := files.SelectFile()
+	file := files.SelectFile("select a file")
 
 	fmt.Println(file.BaseName())
+
+}
+
+func TestFolderSelect(t *testing.T) {
+
+	folder := files.SelectFolder("select a folder")
+
+	fmt.Printf("basename: %s, full path : %s\n",
+		folder.BaseName(),
+		folder.Path)
 
 }

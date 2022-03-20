@@ -12,16 +12,16 @@ type FileSystemObjects struct {
 
 //def __init__(
 //self,
-func (f *FileSystemObjects) Initialise(
+func (fileSystemObject *FileSystemObjects) Initialise(
 	//absolute_path_string: str):
 	absolutePathString string) {
 
 	var err error
 
-	f.Uuid = &uuid_service.UUIDs{}
+	fileSystemObject.Uuid = &uuid_service.UUIDs{}
 
 	//self.uuid = \
-	f.Uuid, err =
+	fileSystemObject.Uuid, err =
 		//create_new_uuid()
 		uuid_service.GetUUID(
 			1,  //TODO - add enumeration
@@ -32,12 +32,12 @@ func (f *FileSystemObjects) Initialise(
 	}
 
 	//self.__path = \
-	f.Path =
+	fileSystemObject.Path =
 		&wrappers.AbsolutePathWrappers{}
 
 	//AbsolutePathWrappers(
 	//absolute_path_string)
-	f.Path.Initialise(
+	fileSystemObject.Path.Initialise(
 		absolutePathString)
 }
 
@@ -45,75 +45,75 @@ func (f *FileSystemObjects) Initialise(
 //def base_name(
 //self) \
 //-> str:
-func (f *FileSystemObjects) BaseName() string {
+func (fileSystemObject *FileSystemObjects) BaseName() string {
 	//return \
 	//self.__path.base_name
-	return f.Path.BaseName()
+	return fileSystemObject.Path.BaseName()
 }
 
 //@property
 //def absolute_path_string(
 //self) \
 //-> str:
-func (f *FileSystemObjects) AbsolutePathString() string {
+func (fileSystemObject *FileSystemObjects) AbsolutePathString() string {
 	//return \
 	//self.__path.absolute_path_string
-	return f.Path.AbsolutePathString()
+	return fileSystemObject.Path.AbsolutePathString()
 }
 
 //@property
 //def absolute_level(
 //self) \
 //-> int:
-func (f *FileSystemObjects) AbsoluteLevel() int {
+func (fileSystemObject *FileSystemObjects) AbsoluteLevel() int {
 	//return \
 	//self.__path.absolute_level
-	return f.Path.AbsoluteLevel()
+	return fileSystemObject.Path.AbsoluteLevel()
 }
 
 //@property
 //def parent_absolute_path_string(
 //self) \
 //-> str:
-func (f *FileSystemObjects) ParentAbsolutePathString() string {
+func (fileSystemObject *FileSystemObjects) ParentAbsolutePathString() string {
 	//return \
 	//str(self.__path.parent)
-	return f.Path.Parent().PathString()
+	return fileSystemObject.Path.Parent().PathString()
 }
 
 //def extend_path(
 //self,
 //path_extension: str) \
 //-> str:
-func (f *FileSystemObjects) ExtendPath(pathExtension string) string {
+func (fileSystemObject *FileSystemObjects) ExtendPath(pathExtension string) string {
 	//return \
 	//self.__path.extend_path(
 	//path_extension)
 
-	return f.Path.ExtendPath(pathExtension)
+	return fileSystemObject.Path.ExtendPath(pathExtension)
 }
 
 //def exists(
 //self) \
 //-> bool:
-func (f *FileSystemObjects) Exists() bool {
+func (fileSystemObject *FileSystemObjects) Exists() bool {
 	//return \
 	//self.__path.exists()
-	return f.Path.Exists()
+	return fileSystemObject.Path.Exists()
 }
 
 //def list_of_components(self):
-func (f *FileSystemObjects) ListOfComponents() []string {
+func (fileSystemObject *FileSystemObjects) ListOfComponents() []string {
 	//return \
 	//self.__path.list_of_components()
-	return f.Path.ListOfComponents()
+	return fileSystemObject.Path.ListOfComponents()
 }
 
 //def item_count(
 //self) \
 //-> int:
-func (f *FileSystemObjects) ItemCount() int {
+func (fileSystemObject *FileSystemObjects) ItemCount() int {
 	//return \
 	//self.__path.item_count()
-	return f.Path.ItemCount()
+	return fileSystemObject.Path.ItemCount()
 }
