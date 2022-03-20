@@ -36,3 +36,13 @@ func TestFolderSelect(t *testing.T) {
 		folder.Path)
 
 }
+
+func TestSelectFilesFromFolder(t *testing.T) {
+
+	folder := files.SelectFolder("select a folder")
+
+	list_of_files := files.GetAllFilesOfExtensionFromFolder(folder, "csv")
+
+	fmt.Printf("list of files :\n %v", list_of_files.List.Len())
+
+}

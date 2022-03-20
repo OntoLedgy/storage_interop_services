@@ -26,7 +26,8 @@ func (folder *Folders) Initialise(absolute_path_string string, parent_folder *Fo
 
 	//	self.child_folders = \
 	//[]
-	folder.ChildFolders = []*Folders{}
+	folder.ChildFolders =
+		[]*Folders{}
 
 	//	self.child_files = \
 	//	[]
