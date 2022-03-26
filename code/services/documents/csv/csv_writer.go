@@ -11,7 +11,7 @@ func Write_2d_slice_set_to_csv_Obsolete(
 
 	for _, slice_row := range slice_to_write {
 
-		Write_1d_slice_to_csv(
+		Write1dSliceToCsv(
 			slice_row,
 			csv_file)
 

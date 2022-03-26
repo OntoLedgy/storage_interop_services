@@ -48,7 +48,7 @@ func Get_file_hashes_for_folder(
 	wait_group := new(sync.WaitGroup)
 
 	output_file, _ :=
-		csv.Open_csv_file(
+		csv.OpenCsvFile(
 			OutputFile)
 
 	for file_index, file := range files_list {
@@ -85,7 +85,7 @@ func Get_file_hashes_for_folder(
 
 			if file_index%batch_size == 0 {
 				fmt.Println("writing : ", file_index-batch_size, "-", file_index, " / ", total_file_count)
-				csv.Write_2d_slice_set_to_csv(file_information_table, output_file)
+				csv.Write2dSliceSetToCsv(file_information_table, output_file)
 				file_information_table = nil
 			}
 
@@ -93,7 +93,7 @@ func Get_file_hashes_for_folder(
 	}
 
 	fmt.Println("writing final : ", total_file_count-(total_file_count%batch_size), "-", total_file_count, " / ", total_file_count)
-	csv.Write_2d_slice_set_to_csv(file_information_table, output_file)
+	csv.Write2dSliceSetToCsv(file_information_table, output_file)
 
 }
 

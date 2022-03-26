@@ -12,7 +12,7 @@ import (
 
 func Copy_files(move_file_list_filename string, delete_source_flag string) (int, error) {
 
-	move_file_list_file, csv_data := csv.Open_csv_file(move_file_list_filename)
+	move_file_list_file, csv_data := csv.OpenCsvFile(move_file_list_filename)
 	move_file_list := csv.Read_csv_to_slice(move_file_list_file, csv_data, "")
 
 	var error_count int = 0

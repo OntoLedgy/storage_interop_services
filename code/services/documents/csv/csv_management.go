@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-func Open_csv_file(csv_filename string) (*os.File, []byte) {
+func OpenCsvFile(csv_filename string) (*os.File, []byte) {
 
 	csv_file, err :=
 		os.OpenFile(
@@ -58,13 +58,13 @@ func Open_csv_file(csv_filename string) (*os.File, []byte) {
 
 }
 
-func Write_2d_slice_set_to_csv(
+func Write2dSliceSetToCsv(
 	slice_to_write [][]string,
 	csv_file *os.File) bool {
 
 	for _, slice_row := range slice_to_write {
 
-		Write_1d_slice_to_csv(
+		Write1dSliceToCsv(
 			slice_row,
 			csv_file)
 
@@ -73,7 +73,7 @@ func Write_2d_slice_set_to_csv(
 	return true
 }
 
-func Write_1d_slice_to_csv(
+func Write1dSliceToCsv(
 	slice_to_write []string,
 	csv_file *os.File) bool {
 
@@ -96,17 +96,20 @@ func Write_1d_slice_to_csv(
 
 }
 
-func ReadCsvToSlice(csv_file_name string, delimiter string) [][]string {
+func ReadCsvToSlice(
+	csv_file_name string,
+	delimiter string) [][]string {
 
 	csv_file,
 		csv_file_data :=
-		Open_csv_file(
+		OpenCsvFile(
 			csv_file_name)
 
-	csv_dataset := Read_csv_to_slice(
-		csv_file,
-		csv_file_data,
-		delimiter)
+	csv_dataset :=
+		Read_csv_to_slice(
+			csv_file,
+			csv_file_data,
+			delimiter)
 
 	return csv_dataset
 
@@ -199,11 +202,11 @@ func Write_slice_to_csv_split_by_column(column_index int, csv_file *os.File) {
 func Write_slice_with_header_to_csv(slice_to_write [][]string, slice_header []string, csv_file_name string) {
 
 	output_csv_file, _ :=
-		Open_csv_file(
+		OpenCsvFile(
 			csv_file_name)
 
-	Write_1d_slice_to_csv(slice_header, output_csv_file)
-	Write_2d_slice_set_to_csv(slice_to_write, output_csv_file)
+	Write1dSliceToCsv(slice_header, output_csv_file)
+	Write2dSliceSetToCsv(slice_to_write, output_csv_file)
 
 }
 
@@ -215,9 +218,9 @@ func save_partitions(partitions map[string][][]string) {
 	for part, recs := range partitions {
 		fmt.Println(part)
 		file_name = `./test/` + part + `.csv`
-		csv_file, _ := Open_csv_file(file_name)
+		csv_file, _ := OpenCsvFile(file_name)
 
-		Write_2d_slice_set_to_csv(recs, csv_file)
+		Write2dSliceSetToCsv(recs, csv_file)
 
 		for _, rec := range recs {
 			fmt.Println(rec)

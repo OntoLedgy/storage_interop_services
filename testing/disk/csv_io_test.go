@@ -12,7 +12,7 @@ func TestCsvIO(t *testing.T) {
 	fileNameAndPath :=
 		file_system_service.CreateFile()
 
-	csv_file, csv_file_data := csv.Open_csv_file(fileNameAndPath.AbsolutePathString())
+	csv_file, csv_file_data := csv.OpenCsvFile(fileNameAndPath.AbsolutePathString())
 
 	csv_dataset :=
 		csv.Read_csv_to_slice(

@@ -8,6 +8,7 @@ require (
 	github.com/OntoLedgy/ol_common_services v0.0.5
 	github.com/TomOnTime/utfutil v0.0.0-20210710122150-437f72b26edf
 	github.com/chigopher/pathlib v0.12.0
+	github.com/emicklei/dot v0.16.0
 	github.com/go-gota/gota v0.12.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/iancoleman/strcase v0.2.0
@@ -20,6 +21,7 @@ require (
 	github.com/sqweek/dialog v0.0.0-20220227145630-7a1c9e333fcf
 	github.com/stretchr/testify v1.7.0
 	github.com/tobgu/qframe v0.3.6
+	github.com/wallix/triplestore v0.0.0-20180213143850-4099dd913851
 	golang.org/x/text v0.3.7
 )
 
