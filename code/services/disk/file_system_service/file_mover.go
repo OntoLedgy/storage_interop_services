@@ -10,86 +10,107 @@ import (
 	"path/filepath"
 )
 
-func Copy_files(move_file_list_filename string, delete_source_flag string) (int, error) {
+func MoveFiles(
+	moveFileListFilename string,
+	deleteSourceFlag string) (int, error) {
 
-	move_file_list_file, csv_data := csv.OpenCsvFile(move_file_list_filename)
-	move_file_list := csv.Read_csv_to_slice(move_file_list_file, csv_data, "")
+	moveFileListFile, csvData :=
+		csv.OpenCsvFile(
+			moveFileListFilename)
 
-	var error_count int = 0
+	moveFileList := csv.Read_csv_to_slice(
+		moveFileListFile,
+		csvData,
+		",")
 
-	fmt.Printf("number of files to process : %s\n", len(move_file_list))
+	var errorCount int = 0
+
+	fmt.Printf("number of files to process : %s\n", len(moveFileList))
 
 	log_file := logging.Set_log_file()
 
 	defer log_file.Close()
 
-	for index, row := range move_file_list {
+	for index, row := range moveFileList {
 
 		if index != 0 {
 
 			log.Printf(
 				"copying %s to %s \n", row[0], row[1])
 
-			sourceFileStat, source_file_stats_error :=
+			sourceFileStat, sourceFileStatsError :=
 				os.Stat(row[0])
 
-			if source_file_stats_error != nil {
-				log.Printf("source file error: %s\n", source_file_stats_error)
-				error_count += 1
+			if sourceFileStatsError != nil {
+				log.Printf("source file error: %s\n", sourceFileStatsError)
+				errorCount += 1
 				continue
 			}
 
 			if !sourceFileStat.Mode().IsRegular() {
-				log.Printf("%s", fmt.Errorf("%s is not a regular file\n", row[0]))
-				error_count += 1
+
+				log.Printf("%s",
+					fmt.Errorf(
+						"%s is not a regular file\n",
+						row[0]))
+
+				errorCount += 1
 			}
 
-			source, source_file_open_error := os.Open(row[0])
+			source, sourceFileOpenError := os.Open(row[0])
 
-			if source_file_open_error != nil {
-				log.Printf("source file error %s\n", source_file_stats_error)
-				error_count += 1
+			if sourceFileOpenError != nil {
+
+				log.Printf(
+					"source file error %s\n",
+					sourceFileOpenError)
+
+				errorCount += 1
+
 				continue
 			}
 			defer source.Close()
 
-			destination_directory := filepath.Dir(row[1])
+			destination_directory :=
+				filepath.Dir(
+					row[1])
 
-			_, destination_directory_stats_error :=
+			_, destinationDirectoryStatsError :=
 				os.Stat(
 					destination_directory)
 
-			if os.IsNotExist(destination_directory_stats_error) {
+			if os.IsNotExist(destinationDirectoryStatsError) {
 				log.Printf("target directory %s does not exits, creating now\n", destination_directory)
 				os.MkdirAll(destination_directory, os.ModePerm)
 
 			}
 
-			destination, destination_file_stats_error :=
-				os.Create(row[1])
+			destination, destinationFileStatsError :=
+				os.Create(
+					row[1])
 
-			if destination_file_stats_error != nil {
-				log.Printf("destination file error: %s\n", source_file_stats_error)
-				error_count += 1
+			if destinationFileStatsError != nil {
+				log.Printf("destination file error: %s\n", sourceFileStatsError)
+				errorCount += 1
 				continue
 			}
 
 			defer destination.Close()
 
-			if delete_source_flag == "yes" {
-				file_move_error := os.Rename(source.Name(), destination.Name())
+			if deleteSourceFlag == "yes" {
+				fileMoveError := os.Rename(source.Name(), destination.Name())
 
-				if file_move_error != nil {
-					log.Printf("cannot move file due to %v\n", file_move_error)
-					error_count += 1
+				if fileMoveError != nil {
+					log.Printf("cannot move file due to %v\n", fileMoveError)
+					errorCount += 1
 				} else {
-					bytes_copied, file_copy_error := io.Copy(destination, source)
+					bytesCopied, fileCopyError := io.Copy(destination, source)
 
-					if file_copy_error != nil {
-						log.Printf("copied file error: %v\n", file_copy_error)
-						error_count += 1
+					if fileCopyError != nil {
+						log.Printf("copied file error: %v\n", fileCopyError)
+						errorCount += 1
 					}
-					log.Printf("sucessfully copied %v bytes\n", bytes_copied)
+					log.Printf("sucessfully copied %v bytes\n", bytesCopied)
 				}
 
 			}
@@ -97,6 +118,6 @@ func Copy_files(move_file_list_filename string, delete_source_flag string) (int,
 		}
 
 	}
-	log.Printf("Process completed with %v errors\n", error_count)
-	return error_count, nil
+	log.Printf("Process completed with %v errors\n", errorCount)
+	return errorCount, nil
 }

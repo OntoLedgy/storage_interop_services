@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func Create_file_if_does_not_exist_else_delete_it(filepath string) {
+func CreateFileIfDoesNotExistElseDeleteIt(filepath string) {
 	// check if file exists
 	var _, err = os.Stat(filepath)
 
@@ -28,7 +28,7 @@ func Create_file_if_does_not_exist_else_delete_it(filepath string) {
 
 }
 
-func Delete_file_it_already_exists(filepath string) {
+func DeleteFileIfItAlreadyExists(filepath string) {
 
 	var _, err = os.Stat(filepath)
 

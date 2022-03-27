@@ -1,5 +1,7 @@
 package object_model
 
+import "os"
+
 type Folders struct {
 	*FileSystemObjects
 	ParentFolder *Folders
@@ -11,18 +13,20 @@ type Folders struct {
 //		self,
 //		absolute_path_string: str,
 //		parent_folder: 'Folders' = None):
-func (folder *Folders) Initialise(absolute_path_string string, parent_folder *Folders) {
+func (folder *Folders) Initialise(
+	absolutePathString string,
+	parentFolder *Folders) {
 
 	folder.FileSystemObjects = &FileSystemObjects{}
 	//super().__init__(
 	folder.FileSystemObjects.Initialise(
 		//absolute_path_string=absolute_path_string)
-		absolute_path_string)
+		absolutePathString)
 
 	//self.parent_folder = \
 	folder.ParentFolder =
 		//parent_folder
-		parent_folder
+		parentFolder
 
 	//	self.child_folders = \
 	//[]
@@ -36,7 +40,42 @@ func (folder *Folders) Initialise(absolute_path_string string, parent_folder *Fo
 
 	//	self.__add_to_parent(
 	//	parent_folder=parent_folder)
-	folder.addToParent(parent_folder)
+	folder.addToParent(
+		parentFolder)
+
+}
+
+func (folder *Folders) Exists() (bool, error) {
+	_, err := os.Stat(folder.AbsolutePathString())
+
+	if err == nil {
+		return true, nil
+	}
+
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+
+	return false, err
+}
+
+func (folder *Folders) CreateIfNonExistent() (bool, error) {
+	folderExists, _ := folder.Exists()
+
+	if folderExists {
+		return true, nil
+	} else {
+
+		folderCreationError := os.Mkdir(
+			folder.AbsolutePathString(),
+			0755)
+
+		if folderCreationError != nil {
+			panic(folderCreationError)
+		}
+		return true, nil
+	}
+
 }
 
 func (folder *Folders) addToChildFiles(file *Files) {

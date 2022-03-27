@@ -3,6 +3,7 @@ package disk
 import (
 	"fmt"
 	files "github.com/OntoLedgy/storage_interop_services/code/services/disk/file_system_service"
+	"github.com/OntoLedgy/storage_interop_services/code/services/disk/file_system_service/object_model"
 	"testing"
 )
 
@@ -13,9 +14,9 @@ func TestFileCreateReadDelete(t *testing.T) {
 
 	fmt.Println("testing file")
 
-	files.Create_file_if_does_not_exist_else_delete_it(fileNameAndPath)
+	files.CreateFileIfDoesNotExistElseDeleteIt(fileNameAndPath)
 
-	files.Delete_file_it_already_exists(fileNameAndPath)
+	files.DeleteFileIfItAlreadyExists(fileNameAndPath)
 
 }
 
@@ -44,5 +45,21 @@ func TestSelectFilesFromFolder(t *testing.T) {
 	list_of_files := files.GetAllFilesOfExtensionFromFolder(folder, "csv")
 
 	fmt.Printf("list of files :\n %v", list_of_files.List.Len())
+
+}
+
+func TestCreateFolder(t *testing.T) {
+
+	folderPath := "D:\\S\\go\\src\\github.com\\OntoLedgy\\storage_interop_services\\testing\\data\\outputs\\testing_foldercreation"
+
+	folder := &object_model.Folders{}
+
+	folder.Initialise(folderPath, nil)
+
+	folder.CreateIfNonExistent()
+
+	folderExists, folderExistanceError := folder.Exists()
+
+	fmt.Printf("folder exists: %v : error: %s", folderExists, folderExistanceError)
 
 }
