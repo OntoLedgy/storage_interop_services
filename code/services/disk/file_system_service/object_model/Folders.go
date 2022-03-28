@@ -1,7 +1,5 @@
 package object_model
 
-import "os"
-
 type Folders struct {
 	*FileSystemObjects
 	ParentFolder *Folders
@@ -42,39 +40,6 @@ func (folder *Folders) Initialise(
 	//	parent_folder=parent_folder)
 	folder.addToParent(
 		parentFolder)
-
-}
-
-func (folder *Folders) Exists() (bool, error) {
-	_, err := os.Stat(folder.AbsolutePathString())
-
-	if err == nil {
-		return true, nil
-	}
-
-	if os.IsNotExist(err) {
-		return false, nil
-	}
-
-	return false, err
-}
-
-func (folder *Folders) CreateIfNonExistent() (bool, error) {
-	folderExists, _ := folder.Exists()
-
-	if folderExists {
-		return true, nil
-	} else {
-
-		folderCreationError := os.Mkdir(
-			folder.AbsolutePathString(),
-			0755)
-
-		if folderCreationError != nil {
-			panic(folderCreationError)
-		}
-		return true, nil
-	}
 
 }
 

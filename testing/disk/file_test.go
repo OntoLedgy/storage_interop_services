@@ -4,6 +4,7 @@ import (
 	"fmt"
 	files "github.com/OntoLedgy/storage_interop_services/code/services/disk/file_system_service"
 	"github.com/OntoLedgy/storage_interop_services/code/services/disk/file_system_service/object_model"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -50,7 +51,7 @@ func TestSelectFilesFromFolder(t *testing.T) {
 
 func TestCreateFolder(t *testing.T) {
 
-	folderPath := "D:\\S\\go\\src\\github.com\\OntoLedgy\\storage_interop_services\\testing\\data\\outputs\\testing_foldercreation"
+	folderPath := "D:\\S\\go\\src\\github.com\\OntoLedgy\\storage_interop_services\\testing\\data\\outputs\\testing_foldercreation2"
 
 	folder := &object_model.Folders{}
 
@@ -58,8 +59,27 @@ func TestCreateFolder(t *testing.T) {
 
 	folder.CreateIfNonExistent()
 
-	folderExists, folderExistanceError := folder.Exists()
+	folderExists := folder.Exists()
 
-	fmt.Printf("folder exists: %v : error: %s", folderExists, folderExistanceError)
+	assert.True(t, folderExists)
+}
 
+func TestCopy(t *testing.T) {
+
+	filePath := "D:\\S\\go\\src\\github.com\\OntoLedgy\\storage_interop_services\\testing\\data\\addresses.csv"
+
+	targetFilePath := "D:\\S\\go\\src\\github.com\\OntoLedgy\\storage_interop_services\\testing\\data\\output\\addresses.csv"
+
+	file := &object_model.Files{}
+
+	file.Initialise(filePath, nil)
+
+	file.CreateIfNonExistent()
+
+	bytesCopied, fileCopied :=
+		file.Copy(targetFilePath)
+
+	fmt.Printf("bytes copied : %v", bytesCopied)
+
+	assert.Nil(t, fileCopied)
 }

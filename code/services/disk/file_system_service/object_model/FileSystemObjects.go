@@ -1,8 +1,13 @@
 package object_model
 
 import (
+	"fmt"
 	"github.com/OntoLedgy/ol_common_services/code/services/identification_services/uuid_service"
 	"github.com/OntoLedgy/storage_interop_services/code/services/disk/file_system_service/wrappers"
+	"io"
+	"log"
+	"os"
+	"path/filepath"
 )
 
 type FileSystemObjects struct {
@@ -99,7 +104,28 @@ func (fileSystemObject *FileSystemObjects) ExtendPath(pathExtension string) stri
 func (fileSystemObject *FileSystemObjects) Exists() bool {
 	//return \
 	//self.__path.exists()
+
 	return fileSystemObject.Path.Exists()
+}
+
+func (fileSystemObject *FileSystemObjects) CreateIfNonExistent() (bool, error) {
+
+	fileSystemObjectExists := fileSystemObject.Exists()
+
+	if fileSystemObjectExists {
+		return true, nil
+	} else {
+
+		folderCreationError := os.Mkdir(
+			fileSystemObject.AbsolutePathString(),
+			0755)
+
+		if folderCreationError != nil {
+			panic(folderCreationError)
+		}
+		return true, nil
+	}
+
 }
 
 //def list_of_components(self):
@@ -116,4 +142,43 @@ func (fileSystemObject *FileSystemObjects) ItemCount() int {
 	//return \
 	//self.__path.item_count()
 	return fileSystemObject.Path.ItemCount()
+}
+
+func (fileSystemObject *FileSystemObjects) Copy(targetPath string) (int64, error) {
+
+	sourceFileStat, err := os.Stat(fileSystemObject.AbsolutePathString())
+	if err != nil {
+		return 0, err
+	}
+
+	if !sourceFileStat.Mode().IsRegular() {
+		return 0, fmt.Errorf(
+			"%s is not a regular file",
+			fileSystemObject.AbsolutePathString())
+	}
+
+	source, err :=
+		os.Open(
+			fileSystemObject.AbsolutePathString())
+
+	if err != nil {
+		return 0, err
+	}
+	defer source.Close()
+
+	directorCreationError := os.MkdirAll(filepath.Dir(targetPath), os.ModePerm)
+
+	if directorCreationError != nil {
+		log.Println(err)
+	}
+
+	destination, err := os.Create(targetPath)
+
+	if err != nil {
+		return 0, err
+	}
+	defer destination.Close()
+	nBytes, err := io.Copy(destination, source)
+
+	return nBytes, err
 }
