@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	doc_xml "github.com/OntoLedgy/storage_interop_services/code/services/documents/xml"
+	"github.com/OntoLedgy/storage_interop_services/testing/data"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -38,7 +39,7 @@ func TestXMLIO(t *testing.T) {
 
 	byteValue, _ := ioutil.ReadAll(xmlFile)
 
-	var leiData LEIData
+	var leiData data.LEIData
 
 	xml.Unmarshal(byteValue, &leiData)
 
