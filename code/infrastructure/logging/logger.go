@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func Set_log_file() *os.File { //TODO: move out to infrastucture
+func SetLogFile() *os.File { //TODO: move out to infrastucture
 
 	log_file_location, log_file_selection_err :=
 		dialog.Directory().Title("Select log file storage location").Browse()

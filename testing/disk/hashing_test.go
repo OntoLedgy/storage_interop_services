@@ -11,7 +11,7 @@ func TestHashing(t *testing.T) {
 
 	outputReportFile := file_system_service.CreateFile()
 
-	file_system_service.Get_file_hashes_for_folder(sourceFolder.Path.PathString(),
+	file_system_service.GetFileHashesForFolder(sourceFolder.Path.PathString(),
 		outputReportFile.AbsolutePathString(),
 		"sha256",
 		0,

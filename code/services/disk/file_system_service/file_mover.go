@@ -27,7 +27,7 @@ func MoveFiles(
 
 	fmt.Printf("number of files to process : %s\n", len(moveFileList))
 
-	log_file := logging.Set_log_file()
+	log_file := logging.SetLogFile()
 
 	defer log_file.Close()
 

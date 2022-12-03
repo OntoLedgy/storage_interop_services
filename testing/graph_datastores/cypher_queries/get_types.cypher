@@ -1,0 +1,1 @@
+MATCH (n:Types) RETURN n LIMIT 2MATCH (n:Types) RETURN n LIMIT 1;

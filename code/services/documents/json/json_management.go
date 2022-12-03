@@ -7,37 +7,50 @@ import (
 	"os"
 )
 
-func Read_json_to_byte_array(
-	json_file_name string) []byte {
+func ReadJsonToByteArray(
+	jsonFileName string) []byte {
 
-	json_data, json_file_read_error :=
+	jsonData, jsonFileReadError :=
 		os.Open(
-			json_file_name)
+			jsonFileName)
 
-	if json_file_read_error != nil {
+	if jsonFileReadError != nil {
 		fmt.Println(
-			json_file_read_error)
+			jsonFileReadError)
 	}
 
 	fmt.Printf(
-		"Successfully Opened %s\n", json_file_name)
+		"Successfully Opened %s\n", jsonFileName)
 
-	defer json_data.Close()
+	defer jsonData.Close()
 
-	json_data_byte_array, _ :=
+	jsonDataByteArray, _ :=
 		ioutil.ReadAll(
-			json_data)
+			jsonData)
 
-	return json_data_byte_array
+	return jsonDataByteArray
 }
 
-func Pretty_print(json_data [][]interface{}) []byte {
+func ReadJson(jsonFileName string) map[string]any {
 
-	pretty_printed_json, _ := json.MarshalIndent(
+	jsonDataByteArray := ReadJsonToByteArray(jsonFileName)
+
+	var jsonDataStructure map[string]any
+
+	err := json.Unmarshal(jsonDataByteArray, &jsonDataStructure)
+	fmt.Println(err)
+
+	return jsonDataStructure
+
+}
+
+func PrettyPrint(json_data [][]interface{}) []byte {
+
+	prettyPrintedJson, _ := json.MarshalIndent(
 		json_data,
 		"",
 		"	") //#TODO add pretty_printer to general utilities
 
-	return pretty_printed_json
+	return prettyPrintedJson
 
 } //TODO - Stage 1 - move to json utilities

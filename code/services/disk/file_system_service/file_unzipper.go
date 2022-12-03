@@ -17,7 +17,7 @@ func Unzip_files_in_folder(
 	//add directory information
 
 	files_list, _, file_walk_errors :=
-		Find_all_directory_content_recursive(
+		FindAllDirectoryContentRecursive(
 			directory_name)
 
 	if file_walk_errors != nil {

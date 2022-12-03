@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 )
 
-func Find_all_directory_content_recursive(root string) ([]string, []os.FileInfo, error) {
+func FindAllDirectoryContentRecursive(root string) ([]string, []os.FileInfo, error) {
 
 	var files []string
 	var files_information []os.FileInfo

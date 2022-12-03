@@ -20,10 +20,11 @@ require (
 	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca
 	github.com/spf13/afero v1.8.2
 	github.com/sqweek/dialog v0.0.0-20220227145630-7a1c9e333fcf
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.7.1
 	github.com/tobgu/qframe v0.3.6
 	github.com/wallix/triplestore v0.0.0-20180213143850-4099dd913851
-	golang.org/x/text v0.3.7
+	github.com/xuri/xgen v0.0.0-20220720145020-7d27a8915cd2
+	golang.org/x/text v0.4.0
 )
 
 require (
@@ -33,11 +34,12 @@ require (
 	github.com/google/uuid v1.1.2 // indirect
 	github.com/kr/pretty v0.2.1 // indirect
 	github.com/mauricelam/genny v0.0.0-20190320071652-0800202903e5 // indirect
+	github.com/neo4j/neo4j-go-driver/v5 v5.3.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/stretchr/objx v0.3.0 // indirect
-	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
-	golang.org/x/sys v0.0.0-20220310020820-b874c991c1a5 // indirect
+	golang.org/x/net v0.1.0 // indirect
+	golang.org/x/sys v0.1.0 // indirect
 	gonum.org/v1/gonum v0.9.3 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	gopkg.in/yaml.v3 v3.0.0 // indirect
 )

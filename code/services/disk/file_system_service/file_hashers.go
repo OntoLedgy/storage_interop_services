@@ -19,102 +19,168 @@ import (
 
 //TODO: copy code from here. https://github.com/russtoku/parallel-copy-and-checksum/blob/master/psha1sum.go
 
-func Get_file_hashes_for_folder(
+//TODO: wrap in struct
+
+func GetFileHashesForFolder(
 	SourceFolder string, // TODO replace with Folders
 	OutputFile string,
 	hashAlgorithm string,
 	skipFiles int,
-	batch_size int) {
-	var file_hash string
+	batchSize int) {
+	var fileHash string
 
-	var file_information_row []string
-	var file_information_table [][]string
-	var total_file_count int
+	var fileInformationTable [][]string
+	var totalFileCount int
 
-	files_list, directory_contents, file_walk_errors := Find_all_directory_content_recursive(SourceFolder)
+	filesList, directoryContents, fileWalkErrors := FindAllDirectoryContentRecursive(SourceFolder)
 
-	if file_walk_errors != nil {
+	if fileWalkErrors != nil {
 
-		fmt.Println("error reading directory : %s", file_walk_errors)
+		fmt.Println("error reading directory : %s", fileWalkErrors)
 
 		return
 	}
-	log_file := logging.Set_log_file()
+	logFile := logging.SetLogFile()
 
-	defer log_file.Close()
-	total_file_count = len(files_list)
-	sort.Strings(files_list)
+	defer logFile.Close()
+	totalFileCount = len(filesList)
+	sort.Strings(filesList)
 
-	wait_group := new(sync.WaitGroup)
+	waitGroup := new(sync.WaitGroup)
 
-	output_file, _ :=
+	outputFile, _ :=
 		csv.OpenCsvFile(
 			OutputFile)
 
-	for file_index, file := range files_list {
+	fileInformationHeader := []string{
+		"file_index",
+		"file_name",
+		"directory_full_path",
+		"file_size",
+		"file_modified_date",
+		"file_mode",
+		"item_is_directory",
+		"file_hash_code"}
 
-		if file_index > skipFiles {
+	fileInformationTable = append(fileInformationTable,
+		fileInformationHeader)
 
-			log.Printf("calculting hash using %s for %s\r\n", hashAlgorithm, file)
-			file_information_row = nil
-			file_information_row = append(
-				file_information_row,
-				strconv.Itoa(file_index),
-				directory_contents[file_index].Name(),
+	fileInformationTable = reportFolderContentsFileInformation(
+		filesList,
+		skipFiles,
+		hashAlgorithm,
+		directoryContents,
+		totalFileCount,
+		fileHash,
+		waitGroup,
+		fileInformationTable,
+		batchSize,
+		outputFile)
+
+	fmt.Println("writing final : ", totalFileCount-(totalFileCount%batchSize), "-", totalFileCount, " / ", totalFileCount)
+	csv.Write2dSliceSetToCsv(fileInformationTable, outputFile)
+
+}
+
+func reportFolderContentsFileInformation(
+	filesList []string,
+	skipFiles int,
+	hashAlgorithm string,
+	directoryContents []os.FileInfo,
+	totalFileCount int,
+	fileHash string,
+	waitGroup *sync.WaitGroup,
+	fileInformationTable [][]string,
+	batchSize int,
+	outputFile *os.File) [][]string {
+
+	var fileInformationRow []string
+
+	for fileIndex, file := range filesList {
+
+		if fileIndex > skipFiles {
+
+			fileInformationRow = reportFileInformation(
+				fileIndex,
+				hashAlgorithm,
 				file,
-				strconv.FormatInt(directory_contents[file_index].Size(), 10),
-				directory_contents[file_index].ModTime().String(),
-				directory_contents[file_index].Mode().String(),
-				strconv.FormatBool(directory_contents[file_index].IsDir()))
+				directoryContents,
+				totalFileCount,
+				fileHash,
+				waitGroup)
 
-			if directory_contents[file_index].IsDir() != true {
+			fileInformationTable = append(
+				fileInformationTable,
+				fileInformationRow)
 
-				fmt.Println("processing : ", file_index, " / ", total_file_count)
+			if fileIndex%batchSize == 0 {
+				fmt.Println("writing : ",
+					fileIndex-batchSize, "-",
+					fileIndex, " / ",
+					totalFileCount)
 
-				file_hash = Calculate_file_hash(
-					file,
-					hashAlgorithm,
-					wait_group)
-				file_information_row = append(
-					file_information_row,
-					file_hash)
+				csv.Write2dSliceSetToCsv(
+					fileInformationTable,
+					outputFile)
 
+				fileInformationTable = nil
 			}
-
-			file_information_table = append(file_information_table, file_information_row)
-
-			if file_index%batch_size == 0 {
-				fmt.Println("writing : ", file_index-batch_size, "-", file_index, " / ", total_file_count)
-				csv.Write2dSliceSetToCsv(file_information_table, output_file)
-				file_information_table = nil
-			}
-
 		}
 	}
+	return fileInformationTable
+}
 
-	fmt.Println("writing final : ", total_file_count-(total_file_count%batch_size), "-", total_file_count, " / ", total_file_count)
-	csv.Write2dSliceSetToCsv(file_information_table, output_file)
+func reportFileInformation(
+	fileIndex int,
+	hashAlgorithm string,
+	file string,
+	directoryContents []os.FileInfo,
+	totalFileCount int,
+	fileHash string,
+	waitGroup *sync.WaitGroup) []string {
+
+	log.Printf("calculting hash using %s for %s\r\n", hashAlgorithm, file)
+
+	fileInformationRow := []string{
+		strconv.Itoa(fileIndex),
+		directoryContents[fileIndex].Name(),
+		file,
+		strconv.FormatInt(directoryContents[fileIndex].Size(), 10),
+		directoryContents[fileIndex].ModTime().String(),
+		directoryContents[fileIndex].Mode().String(),
+		strconv.FormatBool(directoryContents[fileIndex].IsDir())}
+
+	if directoryContents[fileIndex].IsDir() != true {
+
+		fmt.Println("processing : ", fileIndex, " / ", totalFileCount)
+
+		fileHash = CalculateFileHash(
+			file,
+			hashAlgorithm,
+			waitGroup)
+
+		fileInformationRow = append(
+			fileInformationRow,
+			fileHash)
+
+	}
+	return fileInformationRow
 
 }
 
-func monitorWorker(wg *sync.WaitGroup, cs chan string) {
-	wg.Wait()
-	close(cs)
-}
+func CalculateFileHash(
+	filePathAndName string, //TODO replace with Files
+	hashAlgorithm string,
+	waitGroup *sync.WaitGroup) string {
 
-func Calculate_file_hash(
-	file_path_and_name string, //TODO replace with Files
-	hash_algorithm string,
-	wait_group *sync.WaitGroup) string {
-
-	file, err := os.Open(file_path_and_name)
+	file, err := os.Open(filePathAndName)
 
 	if err != nil {
 		panic(err.Error()) //TODO : add proper error handling (skip and log option)
 	}
 	var file_hash hash.Hash
 
-	switch hash_algorithm {
+	switch hashAlgorithm {
 	case "sha256":
 		file_hash = sha256.New()
 	case "sha512":
@@ -133,7 +199,7 @@ func Calculate_file_hash(
 	read_data_channel <- 1
 	hash_data_channel <- 1
 
-	wait_group.Add(1)
+	waitGroup.Add(1)
 
 	go hashHelper(
 		file,
@@ -142,9 +208,9 @@ func Calculate_file_hash(
 		read_status_channel,
 		hash_data_channel,
 		hash_status_channel,
-		wait_group)
+		waitGroup)
 
-	wait_group.Add(1)
+	waitGroup.Add(1)
 
 	hashHelper(
 		file,
@@ -153,20 +219,20 @@ func Calculate_file_hash(
 		read_data_channel,
 		hash_status_channel,
 		hash_data_channel,
-		wait_group)
+		waitGroup)
 
-	wait_group.Wait()
+	waitGroup.Wait()
 
 	file_hash_code := fmt.Sprintf("%x", file_hash.Sum(nil))
 	var file_hash_bytes []byte
 	file_hash_code = string(b64.StdEncoding.EncodeToString(file_hash.Sum(file_hash_bytes)))
-	fmt.Println("file path: ", file_path_and_name, " --> hash code:", file_hash_code)
+	fmt.Println("file path: ", filePathAndName, " --> hash code:", file_hash_code)
 	return file_hash_code
 }
 
 func hashHelper(
 	file *os.File,
-	file_hash hash.Hash,
+	fileHash hash.Hash,
 	mayRead <-chan int,
 	readDone chan<- int,
 	mayHash <-chan int,
@@ -186,7 +252,7 @@ func hashHelper(
 		readDone <- 1
 
 		<-mayHash
-		_, err = file_hash.Write(b[:n])
+		_, err = fileHash.Write(b[:n])
 		if err != nil {
 			panic(err) //TODO : add proper error handling (skip and log option)
 		}
@@ -195,4 +261,10 @@ func hashHelper(
 	}
 	waitGroup.Done()
 
+}
+
+//TODO : check if this is needed
+func monitorWorker(wg *sync.WaitGroup, cs chan string) {
+	wg.Wait()
+	close(cs)
 }
