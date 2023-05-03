@@ -37,7 +37,10 @@ func ReadJson(jsonFileName string) map[string]any {
 
 	var jsonDataStructure map[string]any
 
-	err := json.Unmarshal(jsonDataByteArray, &jsonDataStructure)
+	err := json.Unmarshal(
+		jsonDataByteArray,
+		&jsonDataStructure)
+
 	fmt.Println(err)
 
 	return jsonDataStructure
