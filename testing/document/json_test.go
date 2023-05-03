@@ -8,9 +8,11 @@ import (
 func TestJsonIO(t *testing.T) {
 	filePathAndName := "D:\\S\\go\\src\\github.com\\OntoLedgy\\storage_interop_services\\testing\\data\\sample.json"
 
-	byteArray := json.ReadJsonToByteArray(filePathAndName)
+	byteArray := json.ReadJsonToByteArray(
+		filePathAndName)
 
-	jsonData := json.ReadJson(filePathAndName)
+	jsonData := json.ReadJson(
+		filePathAndName)
 
 	println(byteArray)
 

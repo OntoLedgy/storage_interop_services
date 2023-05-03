@@ -69,6 +69,36 @@ func (neo4JInstance *Neo4J) InsertNode(
 	return result.(*object_model.Nodes), nil
 }
 
+func (neo4JInstance *Neo4J) InsertRelationship(
+	node1, node2 *object_model.Nodes) (
+	*object_model.Nodes,
+	error) {
+	// Sessions are short-lived, cheap to create and NOT thread safe. Typically create one or more sessions
+	// per request in your web application. Make sure to call Close on the session when done.
+	// For multi-database support, set sessionConfig.DatabaseName to requested database
+	// Session config will default to write mode, if only reads are to be used configure session for
+	// read mode.
+
+	session := neo4JInstance.DriverContext.NewSession(
+		neo4JInstance.Context,
+		neo4j.SessionConfig{})
+
+	defer session.Close(
+		neo4JInstance.Context)
+
+	result, err := session.ExecuteWrite(
+		neo4JInstance.Context,
+		neo4JInstance.executeCreateRelationshipTransaction(
+			node1,
+			node2))
+
+	if err != nil {
+		return nil, err
+	}
+	return result.(*object_model.Nodes), nil
+}
+
+//TODO push this to internal
 func (neo4JInstance *Neo4J) executeCreateNodeTransaction(
 	node *object_model.Nodes) neo4j.ManagedTransactionWork {
 
@@ -107,35 +137,6 @@ func (neo4JInstance *Neo4J) executeCreateNodeTransaction(
 	}
 }
 
-func (neo4JInstance *Neo4J) InsertRelationship(
-	node1, node2 *object_model.Nodes) (
-	*object_model.Nodes,
-	error) {
-	// Sessions are short-lived, cheap to create and NOT thread safe. Typically create one or more sessions
-	// per request in your web application. Make sure to call Close on the session when done.
-	// For multi-database support, set sessionConfig.DatabaseName to requested database
-	// Session config will default to write mode, if only reads are to be used configure session for
-	// read mode.
-
-	session := neo4JInstance.DriverContext.NewSession(
-		neo4JInstance.Context,
-		neo4j.SessionConfig{})
-
-	defer session.Close(
-		neo4JInstance.Context)
-
-	result, err := session.ExecuteWrite(
-		neo4JInstance.Context,
-		neo4JInstance.executeCreateRelationshipTransaction(
-			node1,
-			node2))
-
-	if err != nil {
-		return nil, err
-	}
-	return result.(*object_model.Nodes), nil
-}
-
 func (neo4JInstance *Neo4J) executeCreateRelationshipTransaction(
 	node1 *object_model.Nodes,
 	node2 *object_model.Nodes) neo4j.ManagedTransactionWork {
@@ -166,11 +167,21 @@ func (neo4JInstance *Neo4J) executeCreateRelationshipTransaction(
 			return nil, err
 		}
 
-		// You can also retrieve values by name, with e.g. `id, found := record.Get("n.id")`
-
 		return &object_model.Nodes{
 			Id:   record.Values[0].(int64),
 			Name: record.Values[1].(string),
 		}, nil
 	}
+}
+
+func (neo4JInstance *Neo4J) getValue(records neo4j.ResultWithContext) (any, bool) {
+
+	record, err := records.Single(neo4JInstance.Context)
+	if err != nil {
+		return nil, false
+	}
+
+	id, found := record.Get("n.id")
+
+	return id, found
 }
