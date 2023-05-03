@@ -17,6 +17,7 @@ require (
 	github.com/lib/pq v1.10.4
 	github.com/mattn/go-adodb v0.0.1
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
+	github.com/neo4j/neo4j-go-driver/v5 v5.3.0
 	github.com/saintfish/chardet v0.0.0-20120816061221-3af4cd4741ca
 	github.com/spf13/afero v1.8.2
 	github.com/sqweek/dialog v0.0.0-20220227145630-7a1c9e333fcf
@@ -34,7 +35,6 @@ require (
 	github.com/google/uuid v1.1.2 // indirect
 	github.com/kr/pretty v0.2.1 // indirect
 	github.com/mauricelam/genny v0.0.0-20190320071652-0800202903e5 // indirect
-	github.com/neo4j/neo4j-go-driver/v5 v5.3.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/stretchr/objx v0.3.0 // indirect
